@@ -40,10 +40,6 @@ for(file_name in source_files){
 ```{r}
 sids = c('BREMP0018000OOML', 'BREMP0018000SOML')
 
-load_fs <- load_fs_series(sids, auth_path = auth_path)
-
-clean_fs <- clean_fs_series(load_fs)
-
 load_clean <- load_clean_series(sids, auth_path)
 ```
 
