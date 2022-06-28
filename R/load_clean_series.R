@@ -1,4 +1,4 @@
-#' @title Wrapper das funções load_fs_series e clean_fs_series
+#' @title Load and Clean Feature Store (FS) series
 #' @name load_clean_series
 #'
 #' @description Carrega e limpas as séries da FS
@@ -8,8 +8,8 @@
 #'
 #' @author Gabriel Bellé
 #'
-#' @details Wrapper das funções para baixar as séries da FS \code{load_fs_series} e
-#' da função de limpeza das séries da FS \code{clean_fs_series}.
+#' @details Baixa as séries da FS utilizados o pacote series.4macro e limpa elas
+#' para que fiquem no formato de \code{tibble}, empiladas e indicando onde é a projeção.
 #'
 #' @return O retorno é um df contendo as colunas:
 #' \code{sid}: SériesID da série;
@@ -27,8 +27,25 @@
 
 load_clean_series <- function(sids, auth_path) {
 
-  loaded_series <- load_fs_series(sids, auth_path)
-  cleaned_series <- clean_fs_series(loaded_series)
+  query_data <- data.frame(sid = sids, force = T)
+
+  series_fs <- series.4macro::get_multi_series(query_data,
+                                               filepath = auth_path,
+                                               lang = "pt-br")
+
+  cleaned_series <- series_fs %>%
+    tibble::as_tibble() %>%
+    dplyr::select(c(sid, contents)) %>%
+    tidyr::unnest(contents) %>%
+    dplyr::mutate(
+      dt = dt %>%
+        as.Date(),
+      vl = as.numeric(vl),
+      forecast = ifelse(lbl == '', F, T)) %>%
+    dplyr::arrange(sid, dt) %>%
+    dplyr::rename(date = dt) %>%
+    dplyr::select(-lbl) %>%
+    dplyr::relocate(forecast, .before = 'vl')
 
   return(cleaned_series)
 }
