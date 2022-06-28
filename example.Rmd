@@ -1,0 +1,49 @@
+---
+title: "Example Simple-forecasts"
+output: html_document
+---
+
+```{r}
+#Coleta o nome de usuário
+user <- Sys.getenv('USERNAME')
+user_path <- paste0('C:/Users/', user, '/')
+
+# Define os paths para cada usuário ---------------------------------------
+
+if(user == 'GabrielBelle') {
+  #Insira o caminho do arquivo de autentição do series.4macro 
+  auth_path <- paste0(user_path, 
+                      'Documents/Trabalhos/auth.ini')
+  
+  git_path <- paste0(user_path,
+                     'Documents/Trabalhos/git/')
+  
+  dre_sharepoint_path <- paste0(user_path,
+                                '4intelligence/Feature Store - Documentos/DRE/')
+}
+
+library(tidyverse)
+library(series.4macro)
+```
+
+```{r}
+source_files <- list.files(paste0(git_path,'simple-forecasts/R/'))
+
+for(file_name in source_files){
+  source(paste0(git_path,
+                'simple-forecasts/R/',
+                file_name))
+  }
+```
+
+### Função para coletar dado da FS
+```{r}
+sids = c('BREMP0018000OOML', 'BREMP0018000SOML')
+
+load_fs <- load_fs_series(sids, auth_path = auth_path)
+
+clean_fs <- clean_fs_series(load_fs)
+
+load_clean <- load_clean_series(sids, auth_path)
+```
+
