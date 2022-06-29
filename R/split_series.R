@@ -4,6 +4,7 @@
 #' @description Retorna apenas uma série de um df contendo séries empilhadas.
 #' Pode ser útil como função auxiliar.
 #'
+#' @param df Dataframe contendo a base de dados a ser quebrada, mais detalhes abaixo;
 #' @param name_sid Chr contendo o nome da série a ser retornada;
 #' @param type Chr dizendo se deve retornar apenas a série realizada, projetada ou ambos.
 #'
@@ -44,7 +45,7 @@ split_series <- function(df, name_sid, type) {
       dplyr::filter(!forecast)
   } else if (type  == 'projetado') {
     df <- df %>%
-      dplyr::filter(!forecast)
+      dplyr::filter(forecast)
   }
 
   df <- df %>%
