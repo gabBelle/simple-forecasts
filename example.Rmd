@@ -25,6 +25,10 @@ if(user == 'GabrielBelle') {
 library(tidyverse)
 library(series.4macro)
 library(lubridate)
+library(fable)
+library(feasts)
+library(tsibble)
+library(seasonal)
 ```
 
 ```{r}
