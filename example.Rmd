@@ -24,6 +24,7 @@ if(user == 'GabrielBelle') {
 
 library(tidyverse)
 library(series.4macro)
+library(lubridate)
 ```
 
 ```{r}
@@ -41,5 +42,7 @@ for(file_name in source_files){
 sids = c('BREMP0018000OOML', 'BREMP0018000SOML')
 
 load_clean <- load_clean_series(sids, auth_path)
+
+df <- split_series(load_clean, 'BREMP0018000OOML', type = 'realizado')
 ```
 
