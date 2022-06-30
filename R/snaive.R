@@ -20,7 +20,8 @@
 #'               
 #' }
 #'
-#' @export
+#' @export 
+#' 
 
 snaive <- function(df, nmeans = numeric()){
   
