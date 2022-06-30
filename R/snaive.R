@@ -1,7 +1,7 @@
-#' @title Seasonal naïve method
+#' @title Seasonal naïve method & Method Drift 
 #' @name snaive
 #'
-#' @description Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior)
+#' @description Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior). E aplicação de drift
 #'
 #' @param df DataFrame contendo a série limpa e organizada;
 #' @param nmeans Numérico indicando o número de anos para aplicar a média.
