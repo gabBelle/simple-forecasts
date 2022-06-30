@@ -21,13 +21,12 @@
 #' }
 #'
 #' @export 
-#' 
+
 
 snaive <- function(df, nmeans = numeric()){
   
     serie <- expand_series(df,
-                           end_projection = '2026-12-01', 
-                           periodicity = "month") %>% 
+                           end_projection = '2026-12-01') %>% 
              dplyr::mutate(month = month(date))
       
     base_date <- df %>% 

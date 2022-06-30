@@ -24,17 +24,15 @@
 #'
 #' @export
 
-expand_series <- function(df, end_projection, periodicity = 'month') {
+expand_series <- function(df, end_projection) {
 
-  n_months = ifelse(periodicity == 'month', 1,
-                    ifelse(periodicity == 'quarter', 3,
-                           stop('Erro na periodicidade! Escolha "month" ou "quarter')))
+  periodicity <- get_periodicity(df)
 
   df <- df %>%
     bind_rows(
-      tibble(date = seq(max(df$date) %m+% months(n_months), #Lubridate
+      tibble(date = seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
                         as.Date(end_projection),
-                        by = periodicity)
+                        by = periodicity$p_name)
              )
     )
 
