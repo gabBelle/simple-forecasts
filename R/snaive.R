@@ -21,7 +21,6 @@
 #' }
 #'
 #' @export 
-#' 
 
 snaive <- function(df, drift = FALSE, nmeans = numeric()){
   
