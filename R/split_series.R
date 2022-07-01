@@ -27,7 +27,7 @@
 #'
 #' @export
 
-split_series <- function(df, name_sid, type) {
+split_series <- function(df, name_sid, type = 'ambos') {
 
   if(!all(c('sid', 'date', 'forecast', 'vl') %in% colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
@@ -46,10 +46,10 @@ split_series <- function(df, name_sid, type) {
   } else if (type  == 'projetado') {
     df <- df %>%
       dplyr::filter(forecast)
+  } else if (type == 'ambos') {
+    df <- df %>%
+      dplyr::select(date, vl)
   }
-
-  df <- df %>%
-    dplyr::select(date, vl)
 
   return(df)
 }
