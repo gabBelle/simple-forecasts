@@ -34,23 +34,23 @@ get_seas_adj <- function(df) {
     dplyr::select(date, stl) %>%
     dplyr::mutate(date = as.Date(date))
 
-  mo <- as.numeric(format(pib$date[1], '%m'))
-  yr <- as.numeric(format(pib$date[1], '%Y'))
-  pib_x13 <- stats::ts(pib[[2]], start = c(yr, mo),
-                       freq = periodicity$p_nmonths) %>%
-    seas() %>%
-    final() %>%
-    as_tibble() %>%
-    bind_cols(pib$date) %>%
-    rename(x13 = 1,
-           date = 2)
-
-  test <- pib_dessaz %>%
-    rename(dessaz_fs = vl) %>%
-    left_join(pib) %>%
-    left_join(pib_stl %>% select(date, stl)) %>%
-    left_join(pib_x13) %>%
-    pivot_longer(-date)
+  # mo <- as.numeric(format(pib$date[1], '%m'))
+  # yr <- as.numeric(format(pib$date[1], '%Y'))
+  # pib_x13 <- stats::ts(pib[[2]], start = c(yr, mo),
+  #                      freq = periodicity$p_nmonths) %>%
+  #   seas() %>%
+  #   final() %>%
+  #   as_tibble() %>%
+  #   bind_cols(pib$date) %>%
+  #   rename(x13 = 1,
+  #          date = 2)
+  #
+  # test <- pib_dessaz %>%
+  #   rename(dessaz_fs = vl) %>%
+  #   left_join(pib) %>%
+  #   left_join(pib_stl %>% select(date, stl)) %>%
+  #   left_join(pib_x13) %>%
+  #   pivot_longer(-date)
 
   return(df_stl)
 }
