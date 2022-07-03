@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' test_mult = holtWinter(df, type = "multiplicative", end_projection = "2026-12-01")
+#' holtWinter(df, type = "multiplicative", end_projection = "2023-12-01")
 #'               
 #' }
 #'
@@ -33,7 +33,8 @@ holtWinter <- function(df, type = as.character(), end_projection = as.Date()){
        hw_model <- df %>%
                    dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
                    tsibble::as_tsibble(index = date) %>% 
-                   fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("A")))
+                   fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("A"))) %>% 
+                   fabletools::report()
 
     hw_projection = hw_model %>% 
                        fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*12)
@@ -43,7 +44,8 @@ holtWinter <- function(df, type = as.character(), end_projection = as.Date()){
     hw_model <- df %>%
                 dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
                 tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl ~ error("M") + trend("A") + season("M")))
+                fabletools::model(fable::ETS(vl ~ error("M") + trend("A") + season("M"))) %>% 
+                fabletools::report()
       
     hw_projection = hw_model %>% 
                     fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*12)
@@ -53,7 +55,8 @@ holtWinter <- function(df, type = as.character(), end_projection = as.Date()){
     hw_model <- df %>%
                 dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
                 tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("N")))
+                fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("N"))) %>% 
+                fabletools::report()
       
     hw_projection = hw_model %>% 
                     fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*12)
