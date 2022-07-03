@@ -1,5 +1,5 @@
 #' @title Holt-Winters 
-#' @name snaive
+#' @name holtWinter
 #'
 #' @description Aplicação do método Holt-Winters para projeção 
 #'
