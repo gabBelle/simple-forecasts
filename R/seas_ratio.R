@@ -1,8 +1,8 @@
 #' @title Seasonality ratio
 #' @name seas_ratio
 #'
-#' @description Realiza a projeção de uma série original usando a razão entre
-#' a série original e seu dessaz histórico.
+#' @description Realiza a projeção de uma série original usando a projeção de uma série dessaz
+#' fazendo a compatibilização pela razão histórica entre a série original e a dessaz.
 #'
 #' @author Gabriel Bellé
 #'
