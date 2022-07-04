@@ -1,7 +1,11 @@
 #' @title Seasonality adjust
 #' @name get_seas_adj
 #'
-#' @description Calcula o dessaz de uma série com as configurações automáticas do STL/X13 e computa média.
+#' @description Calcula o dessaz de uma série com as configurações automáticas
+#' do STL ou do X13, opcional retornar a média dos dois.
+#'
+#' @param df Dataframe contendo a série a ser dessazonalizada;
+#' @param type tipo de dessaz a ser aplicado.
 #'
 #' @author Gabriel Bellé
 #'
@@ -9,48 +13,49 @@
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação.
 #'
+#' O type pode ser 'STL', 'X13' ou agregações como 'mean' ou 'median'.
+#' O padrão é 'median'.
+#'
 #' @return O retorno é um df contendo os valores da série dessazonalidada e a data.
 #'
 #' @examples
 #' \dontrun{
-#' get_seas_adj(df = cleaned_df)
+#' get_seas_adj(df = cleaned_df, type = 'median')
 #' }
 #'
 #' @export
 
-get_seas_adj <- function(df) {
+get_seas_adj <- function(df, type = 'median') {
 
   periodicity <- get_periodicity(df)
 
-  df_stl <- df %>%
-    mutate(date = tsibble::yearmonth(date)) %>%
-    tsibble::as_tsibble(index = date) %>%
-    fabletools::model(feasts::STL(vl ~ season(window = 'periodic',
-                                              period = periodicity$p_nmonths),
-              robust = T)) %>%
-    fabletools::components() %>%
-    tibble::as_tibble() %>%
-    dplyr::rename(stl = season_adjust) %>%
-    dplyr::select(date, stl) %>%
-    dplyr::mutate(date = as.Date(date))
+  if(type == 'STL') {
+    df_dessaz = get_stl(df) %>%
+      dplyr::rename(vl = 'stl')
 
-  # mo <- as.numeric(format(pib$date[1], '%m'))
-  # yr <- as.numeric(format(pib$date[1], '%Y'))
-  # pib_x13 <- stats::ts(pib[[2]], start = c(yr, mo),
-  #                      freq = periodicity$p_nmonths) %>%
-  #   seas() %>%
-  #   final() %>%
-  #   as_tibble() %>%
-  #   bind_cols(pib$date) %>%
-  #   rename(x13 = 1,
-  #          date = 2)
-  #
-  # test <- pib_dessaz %>%
-  #   rename(dessaz_fs = vl) %>%
-  #   left_join(pib) %>%
-  #   left_join(pib_stl %>% select(date, stl)) %>%
-  #   left_join(pib_x13) %>%
-  #   pivot_longer(-date)
+  } else if (type == 'X13') {
+    df_dessaz = get_x13(df) %>%
+      dplyr::rename(vl = 'x13')
 
-  return(df_stl)
+  } else {
+    df_stl = get_stl(df)
+    df_x13 = get_x13(df)
+
+    df_dessaz <- df_stl %>%
+      dplyr::left_join(df_x13) %>%
+      stats::na.omit()
+
+    if(type == 'mean') {
+      df_dessaz <- df_dessaz %>%
+        dplyr::mutate(vl = mean(stl, x13, na.rm = T)) %>%
+        dplyr::select(date, vl)
+
+    } else {
+      df_dessaz <- df_dessaz %>%
+        dplyr::mutate(vl = median(stl, x13, na.rm = T)) %>%
+        dplyr::select(date, vl)
+    }
+  }
+
+  return(df_dessaz)
 }
