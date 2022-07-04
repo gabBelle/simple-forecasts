@@ -42,13 +42,15 @@ split_series <- function(df, name_sid, type = 'ambos') {
 
   if(type == 'realizado') {
     df <- df %>%
-      dplyr::filter(!forecast)
+      dplyr::filter(!forecast) %>%
+      dplyr::select(date, vl)
   } else if (type  == 'projetado') {
     df <- df %>%
-      dplyr::filter(forecast)
+      dplyr::filter(forecast) %>%
+      dplyr::select(date, vl)
   } else if (type == 'ambos') {
     df <- df %>%
-      dplyr::select(date, vl)
+      dplyr::select(date, vl, forecast)
   }
 
   return(df)
