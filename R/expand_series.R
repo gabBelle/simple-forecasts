@@ -29,12 +29,14 @@ expand_series <- function(df, end_projection) {
   periodicity <- get_periodicity(df)
 
   df <- df %>%
+    mutate(forecast = F) %>%
     bind_rows(
       tibble(date = seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
                         as.Date(end_projection),
                         by = periodicity$p_name)
              )
-    )
+    ) %>%
+    mutate(forecast = ifelse(is.na(forecast), T, forecast))
 
   return(df)
 }

@@ -43,7 +43,7 @@ for(file_name in source_files){
 
 ### Função para coletar dado da FS
 ```{r}
-sids = c('BREMP0018000OOML', 'BREMP0018000SOML')
+sids = c('BREMP0018000OOML', 'BREMP0018000SOML', 'BRGDP0002000ROQL', 'BRGDP0002000WOQL')
 
 load_clean <- load_clean_series(sids, auth_path)
 
@@ -55,5 +55,33 @@ holtW = holtWinter(df, type = "multiplicative", end_projection = "2023-12-01")
 
 auto_arima = arimaUnivariate(df, end_projection = "2023-12-01")
 
+pib <- split_series(load_clean, 'BRGDP0002000ROQL', type = 'realizado')
+pib_dessaz <- split_series(load_clean, 'BRGDP0002000WOQL', type = 'ambos')
+
 ```
+
+### Função para gerar dessaz 
+```{r}
+pib_dessaz_fct <- get_seas_adj(pib)
+```
+
+```{r}
+test_dessaz <- pib_dessaz %>%
+  rename(dessaz_fs = vl) %>%
+  left_join(pib) %>%
+  rename(original = vl) %>% 
+  left_join(pib_dessaz_fct) %>%
+  pivot_longer(-date)
+  
+ggplot(test_dessaz, aes(x = date, y = value)) +
+  geom_line(aes(color = name), size = 1)
+```
+### Projeção com seas_ratio 
+
+```{r}
+seas_ratio_forecast <- seas_ratio(pib, pib_dessaz, nmeans = 5)
+
+tail(seas_ratio_forecast)
+```
+
 

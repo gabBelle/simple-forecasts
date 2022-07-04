@@ -1,7 +1,7 @@
 #' @title Seasonal naïve method 
 #' @name snaive
 #'
-#' @description Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior). 
+#' @description Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média dos anos escolhida; 
 #'
 #' @param df DataFrame contendo a série limpa e organizada;
 #' @param nmeans Numérico indicando o número de anos para aplicar a média.
@@ -22,7 +22,7 @@
 #'
 #' @export 
 
-snaive <- function(df, drift = FALSE, nmeans = numeric(), end_projection = as.Date()){
+snaive <- function(df, drift = FALSE, nmeans = NULL, end_projection){
   
     serie <- expand_series(df,
                            end_projection) %>% 
@@ -40,7 +40,8 @@ snaive <- function(df, drift = FALSE, nmeans = numeric(), end_projection = as.Da
     output <- serie %>% 
                  dplyr::left_join(base_date) %>% 
                  dplyr::mutate(vl = ifelse(is.na(vl), vl_mean, vl)) %>% 
-                 dplyr::select(date, vl)
+                 dplyr::select(date, vl) %>% 
+                 dplyr::full_join(select(serie, date, forecast), by = "date")
     
     return(data.frame(output))
 } 
