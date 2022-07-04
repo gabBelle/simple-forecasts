@@ -48,5 +48,12 @@ sids = c('BREMP0018000OOML', 'BREMP0018000SOML')
 load_clean <- load_clean_series(sids, auth_path)
 
 df <- split_series(load_clean, 'BREMP0018000OOML', type = 'realizado')
+
+snaive = snaive(df, drift = F, nmeans = 1, end_projection = "2022-12-01")
+
+holtW = holtWinter(df, type = "multiplicative", end_projection = "2023-12-01")
+
+auto_arima = arimaUnivariate(df, end_projection = "2023-12-01")
+
 ```
 
