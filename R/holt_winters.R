@@ -60,6 +60,18 @@ holtWinter <- function(df, type = as.character(), end_projection = as.Date()){
       
     hw_projection = hw_model %>% 
                     fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*12)
+  
+      }else if(type == "default"){
+    
+    hw_model <- df %>%
+                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
+                tsibble::as_tsibble(index = date) %>% 
+                fabletools::model(fable::ETS(vl)) %>% 
+                fabletools::report()
+      
+    hw_projection = hw_model %>% 
+                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*12)  
+      
     }else{
       stop("ERRO: Type inexistente")
   }
