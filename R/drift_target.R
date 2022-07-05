@@ -1,8 +1,11 @@
 #' @title Drift forecast with target values
 #' @name drift_target
 #'
-#' @description Realiza a projeção de uma série usando tendência naive,
-#' calculada com base no valor final desejado para o fim de período do ano.
+#' @description Realiza a projeção de uma tendência naive, a qual pode ser acoplada em uma projeção.
+#' O drift_target irá utilizar um vetor pré-definido com o valor para final de período desejado e calculará
+#'
+#' Ex: drift naive, repete o último valor e soma ou multiplica o valor do drift_forecast; ou,
+#' seasonal naive with drift, repete o último valor do mesmo mês e soma ou multiplica o valor do drift_forecast.
 #'
 #' @author Gabriel Bellé
 #'
@@ -27,8 +30,8 @@
 #' @examples
 #' \dontrun{
 #' drift_target(df = cleaned_df,
-#'            end_projection = '2025-12-01',
-#'            target_value = c(200, 230))
+#'              end_projection = '2025-12-01',
+#'              target_value = c(200, 230, 150, 210, 100))
 #' }
 #'
 #' @export
@@ -39,51 +42,22 @@ drift_target <- function(df,
 
   periodicity <- get_periodicity(df)
 
-  df_forecast <- expand_series(df, end_projection = end_projection)
-
-  df_forecast <- df_forecast %>%
+  df_forecast <- expand_series(df, end_projection = end_projection)  %>%
     dplyr::mutate(year = format(date, '%Y'))
 
-  n_years <- df_forecast %>%
-    dplyr::filter(is.na(vl)) %>%
-    purrr::pluck('year') %>%
-    dplyr::n_distinct()
+  target_value_adj <- check_vector_len(df_forecast = df_forecast,
+                                   vector_to_check = target_value)
 
-  if(length(target_value) > n_years) {
-    warning('Foram fornecidos mais valores em target_value que o número de anos da projeção!')
-
-    target_value <- target_value[1:n_years]
-
-  } else if (length(target_value) < n_years) {
-    last_target <- target_value[-1]
-    target_value <- target_value[1:n_years]
-    target_value <- ifelse(is.na(target_value), last_target, target_value)
-  }
-
-  #Ultimo valor do dado realizado
-  last_vl_hist <- df %>%
-    dplyr::filter(date == max(date)) %>%
+  #Dado realizado do último mês do ano disponível
+  #Se dado realizado acaba em junho/20, em série mensal,
+  #retornar valor de dez/19, por exemplo
+  vl_from_last_month <- df %>%
+    dplyr::mutate(
+      year = format(date, '%Y'),
+      month = format(date, '%m')) %>%
+    dplyr::filter(month == max(month)) %>%
+    dplyr::filter(year == max(year)) %>%
     purrr::pluck('vl')
-
-  #Data que que houve o último dado realizado
-  last_date_hist <- df %>%
-    dplyr::filter(date == max(date)) %>%
-    purrr::pluck('date')
-
-  #Último mês/ano do primeiro ano de projeção
-  last_date_first_year_forecast <- df_forecast %>%
-    dplyr::mutate(year = as.numeric(year)) %>%
-    dplyr::filter(forecast) %>%
-    dplyr::filter(year == min(year)) %>%
-    dplyr::filter(date == max(date)) %>%
-    purrr::pluck('date')
-
-  #Quantidade de meses a serem projetados
-  n_months <- length(
-    seq(last_date_hist,
-        last_date_first_year_forecast,
-        by = periodicity$p_name)
-  )
 
   #Calcula o valor mensal a ser adicionado como tendência para cada ano,
   #Dado os valores em target_value
@@ -92,10 +66,10 @@ drift_target <- function(df,
     dplyr::group_by(year) %>%
     dplyr::filter(date == max(date)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(vl = target_value,
+    dplyr::mutate(vl = target_value_adj,
                   drift_forecast = (vl - lag(vl, 1)) / periodicity$p_nmonths,
                   drift_forecast = ifelse(is.na(drift_forecast),
-                                          (vl - last_vl_hist) / (n_months - 1),
+                                          (vl - vl_from_last_month) / periodicity$p_nmonths,
                                           drift_forecast)
     ) %>%
     dplyr::select(year, drift_forecast)
@@ -104,9 +78,7 @@ drift_target <- function(df,
   df_forecast <- df_forecast %>%
     dplyr::left_join(depara_year_target) %>%
     dplyr::mutate(drift_forecast = ifelse(is.na(vl), drift_forecast, 0),
-                  drift_forecast = cumsum(drift_forecast),
-                  vl = ifelse(is.na(vl), last_vl_hist, vl),
-                  vl = vl + drift_forecast) %>%
+                  drift_forecast = cumsum(drift_forecast)) %>%
     dplyr::select(c(date, drift_forecast))
 
   return(df_forecast)
