@@ -30,55 +30,37 @@ holtWinter <- function(df, type = NULL, end_projection){
     serie <- expand_series(df,
                            end_projection) # Chamando função expand_series 
 
+    hw_base <- df %>% 
+               dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
+               tsibble::as_tsibble(index = date)
+    
 # Filtrangem entre sazonalidade aditiva-multiplicativa e tendência 
     
     if(is.null(type)){
-    hw_model <- df %>%
-                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
-                tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl)) %>% 
-                fabletools::report()
-
-    hw_projection = hw_model %>% 
-                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)
-      
+     
+    hw_model <- hw_base %>% fabletools::model(fable::ETS(vl)) 
+         
     } else if(type == "multiplicative"){
       
-    hw_model <- df %>%
-                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
-                tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl ~ error("M") + trend("A") + season("M"))) %>% 
-                fabletools::report()
-      
-    hw_projection = hw_model %>% 
-                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)
+    hw_model = hw_base %>% fabletools::model(fable::ETS(vl ~ error("M") + trend("A") + season("M"))) 
       
     } else if(type == "additive"){
       
-    hw_model <- df %>%
-                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
-                tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("A"))) %>% 
-                fabletools::report()
+    hw_model = hw_base %>% fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("A")))  
       
-    hw_projection = hw_model %>% 
-                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)
-  
       }else if(type == "trend"){
     
-    hw_model <- df %>%
-                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%
-                tsibble::as_tsibble(index = date) %>% 
-                fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("N"))) %>% 
-                fabletools::report()
-      
-    hw_projection = hw_model %>% 
-                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)  
+    hw_model = hw_base %>% fabletools::model(fable::ETS(vl ~ error("A") + trend("A") + season("N"))) 
       
     }else{
       stop("ERRO: Type inexistente")
   }
       
+    hw_projection = hw_model %>%
+                    fabletools::report() %>% 
+                    fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)  
+    
+    
     result_projection <- data.frame(hw_projection) %>% 
                          dplyr::select(date,.mean) %>% 
                          dplyr::rename(vl = .mean) %>% 
