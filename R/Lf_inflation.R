@@ -22,26 +22,29 @@
 #'
 #' @export 
 
-
-lf_inflation <- function(df, sid){
-    
-    keys <- data.frame(acess = stringr::str_detect(sid, c("BRPR", "USPR", 
-                                                          "EUPR", "ARPR", 
-                                                          "CLPR", "CNPR")))   
-    if(any(keys) == TRUE){
-    inflation <- load_clean_series(sid, auth_path)
+lf_inflation <- function(df, sid, auth_path){
   
-    model_lf <- df %>%
+  if(str_sub(sid, start = 3, end = 5)== 'PRC') && 
+    if(str_sub(sid, start = -2, end = -1)== 'MM') {
+ 
+    inflation <- load_clean_series(sid, auth_path) 
+    }else{
+      stop("ERRO: SID selecionado imcompatível com o grupo de índice de preço ou série não mensal")
+  }
+  # if(max(df$date) >= max(inflation$date)) {
+    
+    model_lf <- df %>% 
                 dplyr::rename(vl_real = vl) %>% 
                 dplyr::left_join(inflation, by = "date") %>% 
-                dplyr::mutate(vl = ifelse(forecast.x == TRUE, (vl_real + vl), vl_real)) %>% 
-                dplyr::select(date,vl)
-    }else{
-      stop("ERRO: SID selecionado imcompatível com o grupo de índice de preço")    
-      
-      }
-  
-  return(model_lf)
+                dplyr::mutate(vl = ifelse(forecast.x, 
+                              vl_real*(1+vl), vl_real))
     
+    }else{ 
+      stop("ERRO: o data.frame deve ter projeção em relação ao original!")
   }
-
+  
+}
+  
+  
+  
+  
