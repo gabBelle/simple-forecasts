@@ -1,22 +1,23 @@
 #' @title Drift forecast with target values
 #' @name drift_target
 #'
-#' @description Realiza a projeção de uma tendência naive, a qual pode ser acoplada em uma projeção.
-#' O drift_target irá utilizar um vetor pré-definido com o valor para final de período desejado e calculará
+#' @description Incorpora tendência na projeção de uma série.
+#' Para calcular a tendência, utiliza a diferença entre o último dado realizado e o valor alvo para o ano.
 #'
-#' Ex: drift naive, repete o último valor e soma ou multiplica o valor do drift_forecast; ou,
-#' seasonal naive with drift, repete o último valor do mesmo mês e soma ou multiplica o valor do drift_forecast.
+#' Atenção! O comportamento dessa função funciona como esperado apenas quando a projeção de entrada foi
+#' originada de um método naive (onde a projeção é apenas a repetição do último valor).
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df Dataframe contendo a série a ser projetada;
-#' @param end_projection Data indicando fim da projeção;
-#' @param target_value Vetor de valores indicando a projeção desejada para final de período
+#' @param df_forecast Dataframe contendo a série a ser projetada;
+#' @param target_value Vetor de valores indicando a projeção desejada para final de período;
+#' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é exponential.
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
+#' O @param df_forecast de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' \code{vl}: valor da observação;
+#' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
 #' O @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
@@ -24,62 +25,108 @@
 #'
 #' Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 #'
+#' @param type_drif o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' alvo em target_value. Caso linear, a tendência será linear, caso exponencial, a tendência será exponencial.
+#'
 #' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
-#' e uma coluna 'drift_forecast', indicando o valor da tendência para aquele período.
+#' e uma coluna 'drift', indicando o valor da tendência para aquele período.
 #'
 #' @examples
 #' \dontrun{
-#' drift_target(df = cleaned_df,
-#'              end_projection = '2025-12-01',
+#' drift_target(df_forecast = cleaned_df,
 #'              target_value = c(200, 230, 150, 210, 100))
 #' }
 #'
 #' @export
 
-drift_target <- function(df,
-                         end_projection,
-                         target_value) {
+drift_target <- function(df_forecast,
+                         target_value,
+                         trend_type = 'exponential') {
 
-  periodicity <- get_periodicity(df)
+  periodicity <- get_periodicity(filter(df_forecast,
+                                        !forecast)
+                                 )
 
-  df_forecast <- expand_series(df, end_projection = end_projection)  %>%
-    dplyr::mutate(year = format(date, '%Y'))
+  df_forecast <- df_forecast %>%
+    dplyr::mutate(
+      year = format(date, '%Y') %>%
+        as.numeric(),
+      month = format(date, '%m') %>%
+        as.numeric()
+    )
 
   target_value_adj <- check_vector_len(df_forecast = df_forecast,
-                                   vector_to_check = target_value)
+                                       vector_to_check = target_value)
 
-  #Dado realizado do último mês do ano disponível
-  #Se dado realizado acaba em junho/20, em série mensal,
-  #retornar valor de dez/19, por exemplo
-  vl_from_last_month <- df %>%
-    dplyr::mutate(
-      year = format(date, '%Y'),
-      month = format(date, '%m')) %>%
-    dplyr::filter(month == max(month)) %>%
-    dplyr::filter(year == max(year)) %>%
-    purrr::pluck('vl')
+  last_row_hist <- df_forecast %>%
+    dplyr::filter(!forecast) %>%
+    tail(1)
 
-  #Calcula o valor mensal a ser adicionado como tendência para cada ano,
-  #Dado os valores em target_value
+  last_vl_hist <- last_row_hist$vl
+
+  last_hist_date <- last_row_hist$date
+
+  first_date_target <- df_forecast %>%
+    dplyr::filter(forecast) %>%
+    dplyr::filter(year == min(year),
+           month == max(month)) %>%
+    purrr::pluck('date')
+
+  dist_hist_first_target <- length(
+    seq(last_hist_date,
+        first_date_target,
+        by = periodicity$p_name)
+  ) - 1
+
   depara_year_target <- df_forecast %>%
     dplyr::filter(forecast) %>%
     dplyr::group_by(year) %>%
     dplyr::filter(date == max(date)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(vl = target_value_adj,
-                  drift_forecast = (vl - lag(vl, 1)) / periodicity$p_nmonths,
-                  drift_forecast = ifelse(is.na(drift_forecast),
-                                          (vl - vl_from_last_month) / periodicity$p_nmonths,
-                                          drift_forecast)
-    ) %>%
-    dplyr::select(year, drift_forecast)
+    dplyr::mutate(vl = target_value_adj)
 
-  #Preenche o df final com a tendência correta para cada ano de projeção
-  df_forecast <- df_forecast %>%
-    dplyr::left_join(depara_year_target) %>%
-    dplyr::mutate(drift_forecast = ifelse(is.na(vl), drift_forecast, 0),
-                  drift_forecast = cumsum(drift_forecast)) %>%
-    dplyr::select(c(date, drift_forecast))
+  if(trend_type == 'linear') {
+    drift_forecast <- depara_year_target %>%
+      dplyr::mutate(
+        drift = (vl - lag(vl,1)) / periodicity$p_nmonths,
+        drift = ifelse(is.na(drift),
+                       (vl - last_hist_vl) / dist_hist_first_target,
+                       drift)
+      ) %>%
+      dplyr::select(c(forecast, year, drift)) %>%
+      dplyr::right_join(df_forecast) %>%
+      dplyr::arrange(date) %>%
+      dplyr::mutate(drift = ifelse(forecast, drift, 0),
+             drift = cumsum(drift))
 
-  return(df_forecast)
+    type_drift = 'add'
+  } else if(trend_type == 'exponential') {
+    drift_forecast <- depara_year_target %>%
+      dplyr::mutate(
+        drift = (vl - lag(vl))/lag(vl),
+        drift = drift + 1,
+        drift = drift ^ (1/periodicity$p_nmonths),
+        first_year = (vl - last_hist_vl) / last_hist_vl,
+        first_year = first_year + 1,
+        first_year = first_year ^ (1/dist_hist_first_target),
+        drift = ifelse(is.na(drift),
+                       first_year,
+                       drift)
+      ) %>%
+      dplyr::select(c(forecast, year, drift)) %>%
+      dplyr::right_join(df_forecast) %>%
+      dplyr::arrange(date) %>%
+      dplyr::mutate(drift = ifelse(forecast, drift, 1),
+             drift = cumprod(drift))
+
+    type_drift = 'mult'
+  }
+
+  drift_forecast <- drift_forecast %>%
+    dplyr::select(c(date, vl, drift, forecast))
+
+  return(list(
+    df = drift_forecast,
+    type_drift = type_drift
+  ))
 }

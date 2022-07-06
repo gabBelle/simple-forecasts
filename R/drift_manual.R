@@ -1,22 +1,19 @@
 #' @title Drift forecast with pre-defined MoM variation.
 #' @name drift_manual
 #'
-#' @description Realiza a projeção de uma tendência naive, a qual pode ser acoplada em uma projeção.
-#' O drift_manual irá utilizar um vetor pré-definido para calcular a tendência futura.
-#'
-#' Ex: drift naive, repete o último valor e soma ou multiplica o valor do drift_forecast; ou,
-#' seasonal naive with drift, repete o último valor do mesmo mês e soma ou multiplica o valor do drift_forecast.
+#' @description Incorpora tendência na projeção de uma série.
+#' Para calcular a tendência, utiliza os valores fornecidos como sendo % de MoM a ser aplicado na projeção.
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df Dataframe contendo a série a ser projetada;
-#' @param end_projection Data indicando fim da projeção;
+#' @param df_forecast Dataframe contendo a série a ser projetada;
 #' @param manual_drift Opcional, vetor de valores numéricos indicando drift em %;
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
+#' O @param df_forecast de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação.
+#' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
 #' O @param manual_drift deve conter um vetor numérico onde cada constante
 #' indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
@@ -28,23 +25,21 @@
 #' Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma % do valor em t + valor em t.
 #'
 #' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
-#' e uma coluna 'drift_forecast', indicando o valor da tendência para aquele período.
+#' e uma coluna 'drift', indicando o valor da tendência para aquele período.
 #'
 #' @examples
 #' \dontrun{
-#' drift_manual(df = cleaned_df,
-#'              end_projection = '2025-12-01',
+#' drift_manual(df_forecast = cleaned_df,
 #'              manual_drift = c(0.1, 0.15))
 #' }
 #'
 #' @export
 
-drift_manual <- function(df,
-                         end_projection,
+drift_manual <- function(df_forecast,
                          manual_drift,
                          n_months = NULL) {
 
-  df_forecast <- expand_series(df, end_projection = end_projection) %>%
+  df_forecast <- df_forecast %>%
     dplyr::mutate(year = format(date, '%Y'))
 
   manual_drift_adj <- check_vector_len(df_forecast = df_forecast,
@@ -55,16 +50,16 @@ drift_manual <- function(df,
     dplyr::group_by(year) %>%
     dplyr::filter(date == max(date)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(drift_forecast = manual_drift_adj)  %>%
-    dplyr::select(year, drift_forecast)
+    dplyr::mutate(drift = manual_drift_adj)  %>%
+    dplyr::select(year, drift)
 
   df_forecast <- df_forecast %>%
     dplyr::left_join(depara_year_manual) %>%
     dplyr::mutate(
-      drift_forecast = drift_forecast / 100 + 1,
-      drift_forecast = ifelse(forecast, drift_forecast, 1),
-      drift_forecast = cumprod(drift_forecast)) %>%
-    dplyr::select(c(date, drift_forecast))
+      drift = drift / 100 + 1,
+      drift = ifelse(forecast, drift, 1),
+      drift = cumprod(drift)) %>%
+    dplyr::select(c(date, vl, drift, forecast))
 
   return(df_forecast)
 

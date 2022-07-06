@@ -1,23 +1,24 @@
 #' @title Drift forecast
 #' @name drift
 #'
-#' @description Realiza a projeção de uma tendência naive, a qual pode ser acoplada em uma projeção.
+#' @description Incorpora tendência na projeção de uma série.
 #'
-#' Ex: drift naive, repete o último valor e soma ou multiplica o valor do drift_forecast; ou,
-#' seasonal naive with drift, repete o último valor do mesmo mês e soma ou multiplica o valor do drift_forecast.
+#' Métodos recomendados de projeção utilizados no input são:
+#' naive e seasonal naive
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df Dataframe contendo a série a ser projetada;
-#' @param end_projection Data indicando fim da projeção;
+#' @param df_forecast Dataframe contendo a série a ser projetada;
 #' @param nmean Opcional, constante numérica;
 #' @param manual_drift Opcional, vetor de valores numéricos indicando drift em %;
 #' @param target_value Opcional, vetor de valores indicando a projeção desejada para final de período.
+#' @param type_drift Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
+#' O @param df_forecast de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' \code{vl}: valor da observação;
+#' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
 #' @param nmean indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
@@ -33,40 +34,36 @@
 #'
 #' @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
-#' end_projection = '2025-12-01' e target_value = c(150, 200)
+#' target_value = c(150, 200)
 #'
-#' Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
+#' Isto fará com que a tendência seja tal qual respeite os valores objetivo.
 #'
-#' @return O retorno é uma lista contendo os objetos:
-#' df: O mesmo df de entrada, com o adicional da do período da projeção com
-#' os valores NA e uma coluna 'drift_forecast', indicando o valor da tendência para aquele período.
-#' type: character indicando como a tendência deve ser adicionada à projeção: add para soma e mult para multiplicação.
+#' @param type_drif o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' alvo em target_value. Caso linear, a tendência será linear, caso exponencial, a tendência será exponencial.
 #'
+#' @return O retorno é o mesmo Dataframe de entrada. No entando, a coluna vl representa os valores adicionados de tendência.
+#' A coluna vl_old é incluída e contém a projeção anterior à modificação.
 #'
 #' @examples
 #' \dontrun{
 #' drift(df = cleaned_df,
-#'       end_projection = '2025-12-01',
 #'       nmean = 5)
 #'
 #' drift(df = cleaned_df,
-#'       end_projection = '2025-12-01',
 #'       manual_drift = c(0.1, 0.15))
 #'
 #' drift(df = cleaned_df,
-#'       end_projection = '2025-12-01',
 #'       target_value = c(200, 230))
 #' }
 #'
 #' @export
 
-drift <- function(df,
-                  end_projection,
+drift <- function(df_forecast,
                   nmeans = 5,
                   manual_drift = NULL,
                   target_value = NULL) {
 
-  df <- df %>%
+  df_forecast <- df_forecast %>%
     dplyr::mutate(date = as.Date(date))
 
   #Checa se apenas 1 dos parâmetros opcionais está selecionado
@@ -81,35 +78,39 @@ drift <- function(df,
 
   if(!is.null(manual_drift)) {
 
-    drift_manual_out <- drift_manual(df = df,
-                                     end_projection = end_projection,
+    drift_manual_out <- drift_manual(df_forecast = df_forecast,
                                      manual_drift = manual_drift)
 
-    df_drift = drift_manual_out$df
+    df_drift = drift_manual_out
     type_drift = 'mult'
 
   } else if(!is.null(target_value)) {
 
-    drift_target_out <- drift_target(df = df,
-                                     end_projection = end_projection,
+    drift_target_out <- drift_target(df_forecast = df_forecast,
                                      target_value = target_value)
 
     df_drift = drift_target_out$df
-    type_drift = 'add'
+    type_drift = drift_target_out$type_drift
 
   } else {
 
-    drift_hist_out <- drift_hist(df = df,
-                                 end_projection = end_projection,
+    drift_hist_out <- drift_hist(df_forecast = df_forecast,
                                  nmeans = nmeans)
 
-    df_drift = drift_hist_out$df
+    df_drift = drift_hist_out
     type_drift = 'add'
-
   }
 
-  return(list(
-    df = df_drift,
-    type = type_drift
-  ))
+  df_out <- df_drift %>%
+    dplyr::rename(vl_old = vl)
+
+  if(type_drift == 'add') {
+    df_out <- df_out %>%
+      dplyr::mutate(vl = vl_old + drift)
+  } else if(type_drif == 'mult') {
+    df_out <- df_out %>%
+      dplyr::mutate(vl = vl_old * drift)
+  }
+
+  return(df_out)
 }
