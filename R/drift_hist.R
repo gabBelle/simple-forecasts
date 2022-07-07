@@ -30,7 +30,7 @@
 #' @export
 
 drift_hist <- function(df_forecast,
-                       nmeans = 1) {
+                       nmeans = NULL) {
 
   df_hist <- df_forecast %>%
     dplyr::filter(!forecast)

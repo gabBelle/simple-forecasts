@@ -59,7 +59,7 @@
 #' @export
 
 drift <- function(df_forecast,
-                  nmeans = 5,
+                  nmeans = NULL,
                   manual_drift = NULL,
                   target_value = NULL,
                   trend_type = NULL) {
@@ -70,11 +70,12 @@ drift <- function(df_forecast,
   #Checa se apenas 1 dos parâmetros opcionais está selecionado
   #Caso todos estejam como NULL o padrão é usar o histórico para calcular
   #A tendência
-  if(all(sapply(list(nmeans, manual_drift, target_value), is.null)) |
-     all(sapply(list(manual_drift, target_value), is.null)) |
-     all(sapply(list(nmeans, target_value), is.null)) |
-     all(sapply(list(nmeans, manual_drift), is.null))) {
-    stop("Somente um dos três parâmetros opcionais pode ser escolhido!")
+  if(!is.null(manual_drift)) {
+    if(!is.null(target_value)) {
+      stop("Escolha apenas 1 método de drift!")
+    } else if(!is.null(nmeans)){
+      stop("Escolha apenas 1 método de drift!")
+    }
   }
 
   if(!is.null(manual_drift)) {
