@@ -258,6 +258,7 @@ ggplot(dessaz) +
 #*Função get_seas_adj*: Calcula o dessaz de uma série com as configurações automáticas do STL ou do X13, opcional retornar a média dos dois. O argumento *type*  representa o dessaz *STL*, *X13* ou agregações como *mean*  (**O default é média **)
 
 ```{r}
+
 dessaz_adj = get_seas_adj(df, type = "mean")
 
 # Organizando os dados dos modelos dessaz 
