@@ -41,7 +41,11 @@
 
 drift_target <- function(df_forecast,
                          target_value,
-                         trend_type = 'exponential') {
+                         trend_type) {
+
+  if(is.null(trend_type)) {
+    trend_type = 'exponential'
+  }
 
   periodicity <- get_periodicity(filter(df_forecast,
                                         !forecast)
@@ -90,7 +94,7 @@ drift_target <- function(df_forecast,
       dplyr::mutate(
         drift = (vl - lag(vl,1)) / periodicity$p_nmonths,
         drift = ifelse(is.na(drift),
-                       (vl - last_hist_vl) / dist_hist_first_target,
+                       (vl - last_vl_hist) / dist_hist_first_target,
                        drift)
       ) %>%
       dplyr::select(c(forecast, year, drift)) %>%
@@ -106,7 +110,7 @@ drift_target <- function(df_forecast,
         drift = (vl - lag(vl))/lag(vl),
         drift = drift + 1,
         drift = drift ^ (1/periodicity$p_nmonths),
-        first_year = (vl - last_hist_vl) / last_hist_vl,
+        first_year = (vl - last_vl_hist) / last_vl_hist,
         first_year = first_year + 1,
         first_year = first_year ^ (1/dist_hist_first_target),
         drift = ifelse(is.na(drift),
