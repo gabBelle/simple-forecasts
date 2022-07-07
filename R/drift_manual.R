@@ -36,8 +36,7 @@
 #' @export
 
 drift_manual <- function(df_forecast,
-                         manual_drift,
-                         n_months = NULL) {
+                         manual_drift) {
 
   df_forecast <- df_forecast %>%
     dplyr::mutate(year = format(date, '%Y'))
