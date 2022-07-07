@@ -25,7 +25,7 @@
 #'
 #' @export
 
-get_seas_adj <- function(df, type = 'median') {
+get_seas_adj <- function(df, type = 'mean') {
 
   periodicity <- get_periodicity(df)
 
@@ -46,16 +46,15 @@ get_seas_adj <- function(df, type = 'median') {
       stats::na.omit()
 
     if(type == 'mean') {
-      df_dessaz <- df_dessaz %>%
-        dplyr::mutate(vl = mean(stl, x13, na.rm = T)) %>%
-        dplyr::select(date, vl)
+    df_dessaz <- df_dessaz %>%
+      dplyr::mutate(vl = purrr::pmap(.l = Filter(is.numeric, .), 
+                    .f = purrr::lift_vd(..f = mean))) %>% 
+      dplyr::select(date, vl)
 
     } else {
-      df_dessaz <- df_dessaz %>%
-        dplyr::mutate(vl = median(stl, x13, na.rm = T)) %>%
-        dplyr::select(date, vl)
+      stop("ERRO: type selecionado incompatível")
     }
   }
 
-  return(df_dessaz)
+  return(data.frame(df_dessaz))
 }
