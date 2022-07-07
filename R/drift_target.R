@@ -44,7 +44,7 @@ drift_target <- function(df_forecast,
                          trend_type) {
 
   if(is.null(trend_type)) {
-    trend_type = 'exponential'
+    trend_type = 'linear'
   }
 
   periodicity <- get_periodicity(filter(df_forecast,

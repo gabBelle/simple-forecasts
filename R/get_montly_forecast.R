@@ -14,7 +14,7 @@
 #' @param df Dataframe contendo a série limpa e organizada;
 #' @param end_projection Data (YYYY-MM-DD) contendo o último mês a ser projetado;
 #' @param target_value Vetor de valores indicando a projeção desejada para final de período;
-#' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é exponential.
+#' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é linear.
 #'
 #' @details
 #' O @param df de entrada deve conter pelo as colunas de:
@@ -39,7 +39,7 @@
 #'                                 end_projection = '2026-12-01',
 #'                                 nmeans = 5,
 #'                                 target_value = c(180, 190, 195, 200),
-#'                                 trend_type = 'exponential') {
+#'                                 trend_type = 'linear') {
 #' }
 #'
 #' @export
@@ -48,7 +48,7 @@ get_montly_forecast <- function(df,
                                 end_projection,
                                 nmeans = NULL,
                                 target_value,
-                                trend_type = 'exponential') {
+                                trend_type = 'linear') {
 
   #Realiza o dessaz
   df_seas_adj <- get_seas_adj(df, type = 'STL')
