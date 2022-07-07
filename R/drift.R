@@ -61,7 +61,8 @@
 drift <- function(df_forecast,
                   nmeans = 5,
                   manual_drift = NULL,
-                  target_value = NULL) {
+                  target_value = NULL,
+                  trend_type = NULL) {
 
   df_forecast <- df_forecast %>%
     dplyr::mutate(date = as.Date(date))
@@ -87,7 +88,8 @@ drift <- function(df_forecast,
   } else if(!is.null(target_value)) {
 
     drift_target_out <- drift_target(df_forecast = df_forecast,
-                                     target_value = target_value)
+                                     target_value = target_value,
+                                     trend_type = trend_type)
 
     df_drift = drift_target_out$df
     type_drift = drift_target_out$type_drift
@@ -107,7 +109,7 @@ drift <- function(df_forecast,
   if(type_drift == 'add') {
     df_out <- df_out %>%
       dplyr::mutate(vl = vl_old + drift)
-  } else if(type_drif == 'mult') {
+  } else if(type_drift == 'mult') {
     df_out <- df_out %>%
       dplyr::mutate(vl = vl_old * drift)
   }
