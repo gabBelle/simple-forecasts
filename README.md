@@ -1,7 +1,7 @@
 # Package simple-forecasts
 ## _Description_
 
-O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL). Com funções acopladas para modelos univariados e outras para modelos bivariados. 
+O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL).  
 
 ## _Installation_
 
