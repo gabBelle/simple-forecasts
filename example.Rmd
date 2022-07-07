@@ -58,7 +58,7 @@ load_clean <- load_clean_series(sids, auth_path)
 load_clean %>% glimpse() # Visualizar os dados importados e organizados 
 ```
 
-#*Função split_series*: Entre as séries importadas da FS, a função retorna apenas uma série empilhada selecionada. O argumento type retorna a série *realizado*, *projetado* ou *ambos* 
+#*Função split_series*: Entre as séries importadas da FS, a função retorna apenas uma das séries. O argumento type retorna a série *realizado*, *projetado* ou *ambos* 
 
 ```{r}
 # PIB Real - Trimestral (1995=100)
@@ -68,7 +68,7 @@ df <- split_series(df = load_clean, name_sid = "BRGDP0002000ROQL",
 
 ```
 
-#*Função get_perodicity*: retorna a periodicidade de um dataframe, assim, criando os parâmetros de acordo com a série temporal. Argumento é o *data.frame* selecionado.  
+#*Função get_perodicity*: calcula a periodicidade de uma série, assim, retornando parâmetros de acordo com a série temporal. Argumento é o *data.frame* selecionado.  
 
 ```{r}
 get_periodicity(df = df) 
@@ -78,9 +78,10 @@ get_periodicity(df = df)
 
 ```{r}
 serie <- expand_series(df, end_projection = "2026-12-01")
+tail(serie)
 ```
 
-#*Função snaive*: Modelo Seasonal naïve. Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média de anos escolhida. O argumento *nmeans* representa o número de anos selecionados para aplicação da média.  
+#*Função snaive*: Modelo Seasonal naïve. Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média do mesmo mês de X anos. O argumento *nmeans* representa o número de anos selecionados para aplicação da média.  
 
 ```{r}
 
@@ -100,8 +101,7 @@ plots_snaive <- model_snaive_one %>%
                   rename("Nmeans = 10" = "vl") %>% 
                   select(!c(forecast.x, forecast.y)) %>% 
                   filter(date >= "2010-01-01") %>% 
-                  pivot_longer(
-                               cols =`Nmeans = 1`:`Nmeans = 10`, 
+                  pivot_longer(cols =`Nmeans = 1`:`Nmeans = 10`, 
                                names_to = "Models")
 
 # Visualização dos resultados 
@@ -115,7 +115,7 @@ ggplot(plots_snaive) +
                   `Nmeans = 10` = "red")) +
        labs(x = "")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
+                        xmax = max(plots_snaive$date),
                         ymin = min(df$vl), ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
@@ -128,43 +128,52 @@ ggplot(plots_snaive) +
 
 # Modelo Holt Winters com os argumentos em **type** possíveis 
 
-model_holtW = holtWinter(df, type = NULL, end_projection = "2026-12-01")
-holtW_mult = holtWinter(df, type = "multiplicative", end_projection = "2026-12-01")
-holtW_addit = holtWinter(df, type = "additive", end_projection = "2026-12-01")
-holtW_trend = holtWinter(df, type = "trend", end_projection = "2026-12-01")
+model_holtW = holtWinter(df, type = NULL, end_projection = "2026-12-01") %>% 
+  rename(default = vl)
+
+holtW_mult = holtWinter(df, type = "multiplicative", end_projection = "2026-12-01") %>% 
+  rename(multiplicativo = vl)
+
+holtW_addit = holtWinter(df, type = "additive", end_projection = "2026-12-01") %>% 
+  rename(aditivo = vl)
+
+holtW_trend = holtWinter(df, type = "trend", end_projection = "2026-12-01") %>% 
+  rename(tendencia = vl)
+
 
 # Organizando os modelos para visualização dos resultados 
 
 plot_holt <- model_holtW %>% 
-             full_join(select(holtW_mult, date, vl), by = "date") %>% 
-             full_join(select(holtW_addit, date, vl), by = "date") %>% 
-             full_join(select(holtW_trend, date, vl), by = "date") %>% 
-             rename(default = vl.x, aditivo = vl.y, multiplicativo = vl.x.x, 
-                    "tendência" = "vl.y.y") %>% 
-             select(-forecast) %>% 
+             full_join(holtW_mult) %>% 
+             full_join(holtW_addit) %>% 
+             full_join(holtW_trend) %>% 
              filter(date >= "2010-01-01") %>% 
-             pivot_longer(cols = default:tendência, 
-                          names_to = "Models")
+             mutate(hist = tendencia) %>% 
+             pivot_longer(-c(date, forecast), 
+                          names_to = "Models") %>% 
+             filter((!forecast & Models == 'hist') |
+                      forecast & Models != 'hist')
+             
   
 # Visualização dos resultados 
 
 ggplot(plot_holt) +
        aes(x = date, y = value, colour = Models) +
        geom_line(size = 1.0) +
-       scale_color_manual(
-                          values = c(aditivo = "orange",
-                          default = "blue",
-                          multiplicativo = "red",
-                          tendência = "black"))+
+       scale_color_manual(values = c(aditivo = "orange",
+                                     default = "yellow",
+                                     multiplicativo = "red",
+                                     tendencia = "blue",
+                                     hist = 'black')) +
        labs(x = "")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
+                        xmax = max(plot_holt$date),
                         ymin = min(df$vl), ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
 
 ```
-#*Função arimaUnivariate*: Modelo Auto ARIMA. A função retorna um arima univariado escolhido automaticamente via critério de informação. O argumento *df* representa o data.frame selecioando e, por sua vez, *end_projection* representa a data limite selecionada para projeção. 
+#*Função arimaUnivariate*: Modelo Auto ARIMA. A função retorna um arima univariado escolhido automaticamente. O argumento *df* representa o data.frame selecioando e, por sua vez, *end_projection* representa a data limite selecionada para projeção. 
 
 ```{r}
 model_arima = arimaUnivariate(df, end_projection = "2026-12-01")
@@ -179,7 +188,7 @@ model_arima %>%
             geom_line(size = 1.0)+
             labs(x = "")+
             annotate("rect", xmin = max(df$date), 
-                             xmax = max(model_snaive$date),
+                             xmax = max(model_arima$date),
                              ymin = min(df$vl), ymax = Inf, alpha = 0.4) +
             theme_bw()+
             theme(legend.position = "bottom")
@@ -191,7 +200,7 @@ model_arima %>%
 
 # Organizando os modelos 
 
-mult_plots <- model_snaive %>%
+mult_plots <- model_snaive_five %>%
               rename(Snaive = vl) %>% 
               full_join(model_holtW, by = "date") %>%
               rename(HoltW = vl) %>% 
@@ -213,7 +222,7 @@ ggplot(mult_plots) +
                           Snaive = "black"))+
        labs(x = "", y = "value")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
+                        xmax = max(model_snaive_five$date),
                         ymin = min(df$vl), ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
