@@ -1,7 +1,7 @@
 # Package simple-forecasts
 ## _Description_
 
-O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL). 
+O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL). Com funções acopladas para modelos univariados e outras para modelos bivariados. 
 
 ## _Installation_
 
@@ -45,18 +45,20 @@ load_clean <- load_clean_series(sids, auth_path)
 ```
 **sids** é o argumento que representa as séries temporais selecionadas da FS e, por outro lado, **auth_path** é o caminho para o arquivo de autenticação da series.4macro. 
 
-- **get_perodicity**
-
-```sh
-get_periodicity(df = load_clean)
-```
-O **df** Argumento é o *data.frame* selecionado.  
 - **split_series**
 ```sh
 df <- split_series(df = load_clean, name_sid = "BRGDP0002000ROQL",
                    type = "realizado")
 ```
 O argumento **type** retorna a série realizado, projetado ou ambos
+
+
+- **get_perodicity**
+
+```sh
+get_periodicity(df = df)
+```
+O **df** Argumento é o *data.frame* selecionado.  
 
 - **expand_series**
 ```sh
