@@ -44,7 +44,7 @@ drift_hist <- function(df_forecast,
           as.numeric()
       )
 
-    month_last_date <- nmeans %>%
+    month_last_date <- date_filt %>%
       dplyr::filter(date == max(date)) %>%
       purrr::pluck('month')
 
