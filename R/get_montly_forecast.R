@@ -80,5 +80,5 @@ get_montly_forecast <- function(df,
                               df_dessaz = df_drift,
                               nmeans = nmeans)
 
-  return(df_forecast)
+  return(df_seas_ratio)
 }
