@@ -4,8 +4,8 @@
 #' @description Aplicação do método Holt-Winters para projeção 
 #'
 #' @param df DataFrame contendo a série limpa e organizada;
-#' @param type Tipo de Holt-Winters: mutiplicativo, aditivo, tendência e default;
-#' @param end_projection representa a data final, último mês ou trimestre, da projeção.
+#' @param type Tipo de Holt-Winters: mutiplicativo, aditivo, tendência e NULL (default);
+#' @param end_forecast representa a data final, último mês ou trimestre, da projeção.
 #'
 #' @author Luiz Paulo T. 
 #'
@@ -18,17 +18,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' holtWinter(df, type = NULL, end_projection = "2026-12-01")
+#' holtWinter(df, type = NULL, end_forecast = "2026-12-01")
 #'               
 #' }
 #'
 #' @export 
 
 
-holtWinter <- function(df, type = NULL, end_projection){
+holtWinter <- function(df, type = NULL, end_forecast){
 
+    if(!all(c('date', 'vl') %in% colnames(df))) {
+      stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
     serie <- expand_series(df,
-                           end_projection) # Chamando função expand_series 
+                           end_forecast) # Chamando função expand_series 
 
     hw_base <- df %>% 
                dplyr::mutate(date = tsibble::yearmonth(as.character(date))) %>%

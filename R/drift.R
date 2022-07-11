@@ -9,7 +9,7 @@
 #' @author Gabriel Bellé
 #'
 #' @param df_forecast Dataframe contendo a série a ser projetada;
-#' @param nmean Opcional, constante numérica;
+#' @param nyears Opcional, constante numérica;
 #' @param manual_drift Opcional, vetor de valores numéricos indicando drift em %;
 #' @param target_value Opcional, vetor de valores indicando a projeção desejada para final de período.
 #' @param type_drift Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.
@@ -20,7 +20,7 @@
 #' \code{vl}: valor da observação;
 #' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
-#' @param nmean indica quantos anos do histórico serão utilizados para calcular a tendência linear.
+#' @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
 #'
 #' @param manual_drift deve conter um vetor numérico onde cada constante
@@ -47,7 +47,7 @@
 #' @examples
 #' \dontrun{
 #' drift(df = cleaned_df,
-#'       nmean = 5)
+#'       nyears = 5)
 #'
 #' drift(df = cleaned_df,
 #'       manual_drift = c(0.1, 0.15))
@@ -59,11 +59,15 @@
 #' @export
 
 drift <- function(df_forecast,
-                  nmeans = NULL,
+                  nyears = NULL,
                   manual_drift = NULL,
                   target_value = NULL,
                   trend_type = NULL) {
 
+  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   df_forecast <- df_forecast %>%
     dplyr::mutate(date = as.Date(date))
 
@@ -73,7 +77,7 @@ drift <- function(df_forecast,
   if(!is.null(manual_drift)) {
     if(!is.null(target_value)) {
       stop("Escolha apenas 1 método de drift!")
-    } else if(!is.null(nmeans)){
+    } else if(!is.null(nyears)){
       stop("Escolha apenas 1 método de drift!")
     }
   }
@@ -98,7 +102,7 @@ drift <- function(df_forecast,
   } else {
 
     drift_hist_out <- drift_hist(df_forecast = df_forecast,
-                                 nmeans = nmeans)
+                                 nyears = nyears)
 
     df_drift = drift_hist_out
     type_drift = 'add'

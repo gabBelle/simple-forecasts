@@ -9,7 +9,7 @@
 #'
 #' @author Gabriel Bellé
 #'
-#' @details O input deve ser um df contendo pelo as colunas de:
+#' @details O input deve ser um df contendo pelo menos as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação.
 #'
@@ -26,6 +26,10 @@
 
 get_seas_adj <- function(df, type = 'mean') {
 
+  if(!all(c('date', 'vl') %in% colnames(df))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   periodicity <- get_periodicity(df)
 
   if(type == 'STL') {

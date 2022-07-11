@@ -6,10 +6,10 @@
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada;
-#' @param end_projection Data contendo o último mês a ser projetado.
+#' @param end_forecast Data contendo o último mês a ser projetado.
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
+#' O @param df de entrada deve conter pelo menos as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação;
 #'
@@ -19,16 +19,16 @@
 #' @examples
 #' \dontrun{
 #' naive(df = df_cleaned,
-#'       end_projection = '2026-12-01')
+#'       end_forecast = '2026-12-01')
 #' }
 #'
 #' @export
 
 naive <- function(df,
-                  end_projection) {
+                  end_forecast) {
 
   df_forecast <- expand_series(df,
-                               end_projection) %>%
+                               end_forecast) %>%
     tidyr::fill(vl, .direction = 'down')
 
   return(df_forecast)

@@ -7,7 +7,7 @@
 #' @author Gabriel Bellé
 #'
 #' @param df_forecast Dataframe contendo a série a ser projetada;
-#' @param nmean Restrição de anos para uso do histórico da série.
+#' @param nyears Restrição de anos para uso do histórico da série.
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
@@ -15,7 +15,7 @@
 #' \code{vl}: valor da observação;
 #' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
-#' O @param nmean indica quantos anos do histórico serão utilizados para calcular a tendência linear.
+#' O @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
 #'
 #' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
@@ -24,18 +24,22 @@
 #' @examples
 #' \dontrun{
 #' drift_hist(df_forecast = cleaned_df,
-#'            nmeans = 5)
+#'            nyears = 5)
 #' }
 #'
 #' @export
 
 drift_hist <- function(df_forecast,
-                       nmeans = NULL) {
+                       nyears = NULL) {
 
+  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   df_hist <- df_forecast %>%
     dplyr::filter(!forecast)
 
-  if (is.null(nmeans)) {
+  if (is.null(nyears)) {
     date_filt = df_hist %>%
       dplyr::mutate(
         year = format(date, '%Y') %>%
@@ -58,7 +62,7 @@ drift_hist <- function(df_forecast,
 
   } else {
     df_drift_default <- df_hist %>%
-      dplyr::filter(date >= max(date)- years(nmeans))
+      dplyr::filter(date >= max(date)- years(nyears))
   }
 
   start_vl <- df_drift_default %>%

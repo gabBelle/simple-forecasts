@@ -4,6 +4,8 @@
 #' @description Calcula o dessaz de uma série com as configurações automáticas
 #' do STL.
 #'
+#' @param df representa a série para dessazonalização 
+#'
 #' @author Gabriel Bellé
 #'
 #' @details O input deve ser um df contendo pelo as colunas de:
@@ -21,6 +23,10 @@
 
 get_stl <- function(df) {
 
+  if(!all(c('date', 'vl') %in% colnames(df))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   periodicity <- get_periodicity(df)
 
   df_stl <- df %>%

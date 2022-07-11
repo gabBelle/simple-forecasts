@@ -12,7 +12,7 @@
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada;
-#' @param end_projection Data (YYYY-MM-DD) contendo o último mês a ser projetado;
+#' @param end_forecast Data (YYYY-MM-DD) contendo o último mês a ser projetado;
 #' @param target_value Vetor de valores indicando a projeção desejada para final de período;
 #' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é linear.
 #'
@@ -36,8 +36,8 @@
 #' @examples
 #' \dontrun{
 #' get_montly_forecast <- function(df,
-#'                                 end_projection = '2026-12-01',
-#'                                 nmeans = 5,
+#'                                 end_forecast = '2026-12-01',
+#'                                 nyears = 5,
 #'                                 target_value = c(180, 190, 195, 200),
 #'                                 trend_type = 'linear') {
 #' }
@@ -45,8 +45,8 @@
 #' @export
 
 get_montly_forecast <- function(df,
-                                end_projection,
-                                nmeans = NULL,
+                                end_forecast,
+                                nyears = NULL,
                                 target_value,
                                 trend_type = 'linear') {
 
@@ -56,7 +56,7 @@ get_montly_forecast <- function(df,
   #Pega o fator sazonal histórico
   df_hist_seas_ratio <- seas_ratio(df_original = df,
                                    df_dessaz = df_seas_adj,
-                                   nmeans = nmeans)
+                                   nyears = nyears)
 
   last_month_ratio_mean <- df_hist_seas_ratio %>%
     filter(month == max(month)) %>%
@@ -67,7 +67,7 @@ get_montly_forecast <- function(df,
 
   #Faz projeção naive do dessaz
   df_naive <- naive(df = df_seas_adj,
-                    end_projection = end_projection)
+                    end_forecast = end_forecast)
 
   #Adiciona a tendência na projeção naive da série dessaz
   df_drift <- drift(df_forecast = df_naive,
@@ -78,7 +78,7 @@ get_montly_forecast <- function(df,
   #Mantendo a sazonalidade de acordo com o fator dessaz histórico
   df_seas_ratio <- seas_ratio(df_original = df,
                               df_dessaz = df_drift,
-                              nmeans = nmeans)
+                              nyears = nyears)
+  return(df_seas_ratio)
 
-  return(df_forecast)
-}
+  }
