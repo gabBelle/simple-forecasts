@@ -1,9 +1,3 @@
----
-title: "Example Simple-forecasts"
-output: html_document
----
-
-```{r}
 rm(list = ls()) # Limpar a memória 
 
 #Coleta o nome de usuário
@@ -33,7 +27,7 @@ library(tsibble)
 library(seasonal)
 library(zoo)
 library(tsibbledata)
-
+library(purrr)
 ```
 
 ```{r}
@@ -48,7 +42,41 @@ for(file_name in source_files){
 print(source_files)
 ```
 
-#*Função load_clean_series*: carrega dados da FS, limpa e organiza. *sids* é o argumento que representa as séries temporais selecionadas e, por outro lado, *auth_path* é o caminho para o arquivo de autenticação da series.4macro 
+# Argumento das funções: 
+
+*sids* é o argumento que representa as séries temporais selecionadas da FS;
+
+*auth_path* é o caminho para o arquivo de autenticação da series.4macro; 
+
+*type* retorna a série realizado, projetado ou ambos;
+
+*end_forecast* representa a data limite selecionada para projeção, isto é, para preenchimento com NAs; 
+
+*nyears* representa o número de anos selecionados para aplicação da média; 
+
+*df* representa o data.frame selecioando; 
+
+*df_original* representa um dataframe de entrada com a série original; 
+
+*df_dessaz* representa a entrada com a série dessaz e a projeção já realizada até horizonte desejado. 
+
+*df_forecast* Dataframe contendo a série a ser projetada;
+
+*manual_drift* Opcional, vetor de valores numéricos indicando drift em %;
+
+*target_value* Opcional, vetor de valores indicando a projeção desejada para final de período; 
+
+*type_drift* Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado; 
+
+*trend_type* Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é exponential; 
+
+*vector_to_check* Vetor contendo o alvo do drift ou os valores do drift manual; 
+
+*n_months* Opcional, indica por quantos meses cada variação no vetor manual_drift será utilizado. Para série trimestral, quantos trimestres.
+
+###############################################################################
+
+#*Função load_clean_series*: carrega dados da FS, limpa e organiza. 
 
 ```{r}
 sids = c('BRGDP0002000ROQL', 'BRPUB0001000ROML') 
@@ -58,213 +86,362 @@ load_clean <- load_clean_series(sids, auth_path)
 load_clean %>% glimpse() # Visualizar os dados importados e organizados 
 ```
 
-#*Função get_perodicity*: retorna a periodicidade de um dataframe, assim, criando os parâmetros de acordo com a série temporal. Argumento é o *data.frame* selecionado.  
-
-```{r}
-get_periodicity(load_clean) 
-```
-
-#*Função Split Series*: Entre as séries importadas da FS, a função retorna apenas uma série empilhada. O argumento type retorna a série *realizado*, *projetado* ou *ambos* 
+#*Função split_series*: Entre as séries importadas da FS, a função retorna apenas uma das séries.  
 
 ```{r}
 # PIB Real - Trimestral (1995=100)
 
-df <- split_series(load_clean, "BRGDP0002000ROQL", type = "realizado")
+df <- split_series(df = load_clean, name_sid = "BRGDP0002000ROQL", 
+                   type = "realizado")
 
 ```
 
-#*Função expand_series*: Aumenta o vetor de datas de um dataframe, inputando NAs na coluna de observação, para ser preenchida na função de forecast. O argumento *end_projection* representa a data limite selecionada para projeção, isto é, para preenchimento com NAs. 
+#*Função get_perodicity*: calcula a periodicidade de uma série, assim, retornando parâmetros de acordo com a série temporal. 
 
 ```{r}
-serie <- expand_series(df, end_projection = "2026-12-01")
+get_periodicity(df = df) 
 ```
 
-#*Função snaive*: Modelo Seasonal naïve. Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média de anos escolhida. O argumento *nmeans* representa o número de anos selecionados para aplicação da média.  
+#*Função expand_series*: Aumenta o vetor de datas de um dataframe, inputando NAs na coluna de observação, para ser preenchida na função de forecast. 
 
 ```{r}
-model_snaive = snaive(df, nmeans = 5, end_projection = "2026-12-01")
+serie <- expand_series(df, end_forecast = "2026-12-01")
+```
 
-ggplot(data = model_snaive)+
-       aes(x = date, y = vl)+
-       geom_line(size = 1.0)+
+#*Função snaive*: Modelo Seasonal naïve. Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média do mesmo mês de X anos. 
+
+```{r}
+# Modelo Snaive com algumas configurações possíveis no argumento **nyears**
+
+model_snaive_one = snaive(df, nyears = 1, end_forecast = "2026-12-01")
+model_snaive_five = snaive(df, nyears =  5, end_forecast =  "2026-12-01")
+model_snaive_ten = snaive(df, nyears = 10, end_forecast =  "2026-12-01")
+
+# Organizando os modelos para visualização dos resultados 
+
+plots_snaive <- model_snaive_one %>% 
+                  rename("Nyears = 1" = "vl") %>% 
+                  full_join(model_snaive_five, by = "date") %>% 
+                  rename("Nyears = 5" = "vl") %>% 
+                  full_join(model_snaive_ten, by = "date") %>% 
+                  rename("Nyears = 10" = "vl") %>% 
+                  select(!c(forecast.x, forecast.y)) %>% 
+                  filter(date >= "2010-01-01") %>%
+                  mutate(Original = `Nyears = 1`) %>% 
+                  pivot_longer(-c(date, forecast), 
+                               names_to = "Models") %>% 
+                  filter((!forecast & Models == "Original")|
+                           forecast & Models != "Original")
+
+
+# Visualização dos resultados 
+
+ggplot(plots_snaive) +
+       aes(x = date, y = value, colour = Models) +
+       geom_line(size = 1.0) +
+       scale_color_manual(
+       values = c(Original = "black",
+                  `Nyears = 1` = "blue",
+                  `Nyears = 5` = "yellow",
+                  `Nyears = 10` = "red")) +
        labs(x = "")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
-                        ymin = 0, ymax = Inf, alpha = 0.4) +
+                        xmax = max(plots_snaive$date),
+                        ymin = 150, ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
 
 ```
 
-#*Função holtWinter*: Modelo Holt-Winters. O argumento *type* representa a escolha do método do modelo Holt-Winters: **multiplicative**, **additive**, **trend** e **NULL**. O último representa o default, isto é, a escolha automática via critério de informação. 
+#*Função holtWinter*: Modelo Holt-Winters. O argumento type representa a escolha do método do modelo Holt-Winters: **multiplicative**, **additive**, **trend** e **NULL**. O último representa o default, isto é, a escolha automática via critério de informação. 
 
 ```{r}
+# Modelo Holt Winters com os argumentos em **type** possíveis 
 
-model_holtW = holtWinter(df, type = NULL, end_projection = "2026-12-01")
-holtW_mult = holtWinter(df, type = "multiplicative", end_projection = "2026-12-01")
-holtW_addit = holtWinter(df, type = "additive", end_projection = "2026-12-01")
-holtW_trend = holtWinter(df, type = "trend", end_projection = "2026-12-01")
+model_holtW = holtWinter(df, type = NULL, end_forecast =  "2026-12-01") %>% 
+  rename(default = vl)
+
+holtW_mult = holtWinter(df, type = "multiplicative", end_forecast = "2026-12-01") %>% rename(multiplicativo = vl)
+
+holtW_addit = holtWinter(df, type = "additive", end_forecast = "2026-12-01") %>% 
+  rename(aditivo = vl)
+
+holtW_trend = holtWinter(df, type = "trend", end_forecast = "2026-12-01") %>% 
+  rename(tendencia = vl)
+
+# Organizando os modelos para visualização dos resultados 
 
 plot_holt <- model_holtW %>% 
-             full_join(select(holtW_mult, date, vl), by = "date") %>% 
-             full_join(select(holtW_addit, date, vl), by = "date") %>% 
-             full_join(select(holtW_trend, date, vl), by = "date") %>% 
-             rename(default = vl.x, aditivo = vl.y, multiplicativo = vl.x.x, 
-                    "tendência" = "vl.y.y") %>% 
-            select(-forecast) %>% 
-            pivot_longer(cols = default:tendência, 
-                         names_to = "Models")
+             full_join(holtW_mult) %>% 
+             full_join(holtW_addit) %>% 
+             full_join(holtW_trend) %>% 
+             filter(date >= "2010-01-01") %>% 
+             mutate(Original = tendencia) %>% 
+             pivot_longer(-c(date, forecast), 
+                          names_to = "Models") %>% 
+             filter((!forecast & Models == 'Original') |
+                      forecast & Models != 'Original')
+             
   
-# Visualização 
+# Visualização dos resultados 
 
 ggplot(plot_holt) +
        aes(x = date, y = value, colour = Models) +
        geom_line(size = 1.0) +
-       scale_color_manual(
-                          values = c(aditivo = "orange",
-                          default = "blue",
-                          multiplicativo = "red",
-                          tendência = "black"))+
+       scale_color_manual(values = c(Original = 'black',
+                                     aditivo = "orange",
+                                     default = "yellow",
+                                     multiplicativo = "red",
+                                     tendencia = "blue"
+                                     )) +
        labs(x = "")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
-                        ymin = 0, ymax = Inf, alpha = 0.4) +
+                        xmax = max(plot_holt$date),
+                        ymin = 150, ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
 
 ```
-#*Função arimaUnivariate*: Modelo Auto ARIMA. A função retorna um arima univariado escolhido automaticamente via critério de informação. O argumento *df* representa o data.frame selecioando e, por sua vez, *end_projection* representa a data limite selecionada para projeção. 
+
+#*Função arimaUnivariate*: Modelo Auto ARIMA. A função retorna um arima univariado escolhido automaticamente. 
 
 ```{r}
-model_arima = arimaUnivariate(df, end_projection = "2026-12-01")
+model_arima = arimaUnivariate(df, end_forecast = "2026-12-01")
 
-ggplot(data = model_arima)+
-       aes(x = date, y = vl)+
-       geom_line(size = 1.0)+
-       labs(x = "")+
-       annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
-                        ymin = 0, ymax = Inf, alpha = 0.4) +
-       theme_bw()+
-       theme(legend.position = "bottom")
+arima_plot <- model_arima %>% 
+               mutate(Original = ifelse(forecast, NA, vl)) %>% 
+               relocate(Original, .after = vl) %>% 
+               rename(ARIMA = vl) %>%
+               filter(date >= "2010-01-01") %>% 
+               pivot_longer(-c(date, forecast), 
+                            names_to = "Serie")
+
+# Visualizando os resultados do modelo Auto ARIMA 
+
+ggplot(arima_plot) +
+       aes(x = date, y = value, colour = Serie) +
+       geom_line(size = 1.0) +
+       scale_color_manual(
+                          values = c(Original = "black",
+                            ARIMA = "red")) +
+            labs(x = "")+
+            annotate("rect", xmin = max(df$date), 
+                             xmax = max(arima_plot$date),
+                             ymin = 150, ymax = Inf, alpha = 0.4) +
+            theme_bw()+
+            theme(legend.position = "bottom")
 
 ```
+
 # Visualizando o modelo *Snaive*, *Holt-Winters* e *Auto ARIMA*
 
 ```{r}
-mult_plots <- model_snaive %>% 
-              full_join(model_holtW, by = "date") %>%
-              full_join(model_arima, by = "date") %>% 
-              rename(HoltW = vl.y, 
-                     Snaive = vl.x, 
-                     ARIMA = vl)
+# Organizando os modelos 
 
-ggplot(data = mult_plots)+
-       aes(x = date)+
-       geom_line(aes(y = Snaive, col = "Snaive"))+
-       geom_line(aes(y = HoltW, col = "HoltW"))+
-       geom_line(aes(y = ARIMA, col = "ARIMA"))+
+mult_plots <- model_snaive_five %>%
+              rename(Snaive = vl) %>% 
+              full_join(model_holtW, by = "date") %>%
+              rename(HoltW = default) %>% 
+              full_join(model_arima, by = "date") %>%
+              rename(ARIMA = vl) %>% 
+              select(!c(forecast.x, forecast.y)) %>% 
+              mutate(Original = Snaive) %>% 
+              filter(date >= "2010-01-01") %>% 
+              pivot_longer(-c(date, forecast), 
+                          names_to = "Models") %>% 
+              filter((!forecast & Models == 'Original') |
+                      forecast & Models != 'Original')
+
+# Visualizando os resultados 
+             
+ggplot(mult_plots) +
+       aes(x = date, y = value, colour = Models) +
+       geom_line(size = 1.0) +
+       scale_color_manual(
+                          values = c(
+                          Original = "black",
+                          ARIMA = "blue",
+                          HoltW = "red",
+                          Snaive = "yellow"))+
        labs(x = "", y = "value")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
-                        ymin = 0, ymax = Inf, alpha = 0.4) +
+                        xmax = max(model_snaive_one$date),
+                        ymin = 150, ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
-
 ```
-
-# *Função get_x13*: Calcula o dessaz de uma série com as configurações automáticas
-do X13-ARIMA. O argumento *df* representa o data.frame para o dessaz.  
+#*Função get_seas_adj*: Calcula o dessaz de uma série com as configurações automáticas do STL ou do X13, opcional retornar a média dos dois. O argumento type  representa o dessaz *STL*, *X13* ou agregações como *mean*  (**O default é média **)
 
 ```{r}
-x_arima = get_x13(df)
 
-dessaz_arima <- data.frame(original = df, 
-                          dessaz = x_arima) 
+dessaz_arima = get_seas_adj(df, type = "X13")
+dessaz_stl = get_seas_adj(df, type = "STL")
+dessaz_adj = get_seas_adj(df, type = "mean")
 
-ggplot(data = dessaz_arima)+
-       aes(x = original.date)+
-       geom_line(aes(y = original.vl, col = "Original"))+
-       geom_line(aes(y = dessaz.x13, col = "Dessaz X13-ARIMA"))+
-       labs(x = "", y = "value")+
-       theme_bw()+
-       theme(legend.position = "bottom")
+dessaz_adj <- dessaz_adj %>%  
+              mutate(vl = as.numeric(vl))
 
-```
-#*Função get_stl*: Seasonal Decomposition of Time Series by Loess (STL). Calcula o dessaz de uma série com as configurações automáticas do STL. O argumento *df* representa o data.frame para o dessaz.
+dessaz_adj %>% glimpse()
 
-```{r}
-stl = get_stl(df)
+# Organizando os dados dos modelos dessaz 
 
-dessaz_stl <- data.frame(original = df, 
-                          dessaz = stl) 
-
-ggplot(data = dessaz_stl)+
-       aes(x = original.date)+
-       geom_line(aes(y = original.vl, col = "Original"))+
-       geom_line(aes(y = dessaz.stl, col = "Dessaz X13-ARIMA"))+
-       labs(x = "", y = "value")+
-       theme_bw()+
-       theme(legend.position = "bottom")
-
-```
-# Comparação entre *STL* e *X13-ARIMA* 
-
-```{r}
 dessaz <- data.frame(original = df, 
-                     arima = x_arima, 
-                     stl)
+                     ARIMA = dessaz_arima, 
+                     STL = dessaz_stl, 
+                     Mean = dessaz_adj) %>% 
+                     filter(original.date >= "2010-01-01") %>% 
+                     select(original.date, original.vl,
+                            ARIMA.vl, 
+                            STL.vl, Mean.vl) %>% 
+                    pivot_longer(-c(original.date), 
+                                 names_to = "Models")
 
+# Visualizando o resultado 
 
-ggplot(data = dessaz)+
-       aes(x = date)+
-       geom_line(aes(y = original.vl, col = "Original"))+
-       geom_line(aes(y = arima.x13, col = "ARIMA"))+
-       geom_line(aes(y = stl, col = "STL"))+
-       labs(y = "value", x = "")+
-       theme_bw()+
-       theme(legend.position = "bottom")
-```
-#*Função get_seas_adj*: Calcula o dessaz de uma série com as configurações automáticas do STL ou do X13, opcional retornar a média dos dois. O argumento *type* 
-representa o dessaz *STL*, *X13* ou agregações como *mean* ou *median* (**O default é 'median'**)
-
-```{r}
-dessaz_adj_mediana = get_seas_adj(df)
-
-# dessaz_adj_media = get_seas_adj(df, type = "mean")
-
-dessaz_ajd = data.frame(dessaz, dessaz_adj_mediana)
-
-ggplot(data = dessaz_ajd)+
-       aes(x = date)+
-       geom_line(aes(y = vl, col = "Mediana"))+
-       geom_line(aes(y = original.vl, col = "Original"))+
-       geom_line(aes(y = arima.x13, col = "ARIMA"))+
-       geom_line(aes(y = stl, col = "STL"))+
-       labs(y = "value", x = "")+
-       theme_bw()+
-       theme(legend.position = "bottom")
+ggplot(dessaz) +
+      aes(x = original.date, y = value, colour = Models) +
+      geom_line(size = 1.0) +
+      scale_color_manual(
+                         values = c(ARIMA.vl = "blue",
+                         Mean.vl = "red",
+                         original.vl = "black",
+                         STL.vl = "orange")) +
+      labs(x = "")+
+      theme_bw()+
+      theme(legend.position = "bottom")
 
 
 ```
-#*Função seas_ratio*: Realiza a projeção de uma série original usando a projeção de uma série dessaz fazendo a compatibilização pela razão histórica entre a série original e a dessaz. O argumento *df_original* representa um dataframe de entrada com a série original, o *df_dessaz* representa a entrada com a série dessaz e a projeção já realizada até horizonte desejado e, por fim, *nmeans* representa o número de número de anos que será utilizado do histórico para as computações (**opcional**). 
+
+#*Função seas_ratio*: Realiza a projeção de uma série original usando a projeção de uma série dessaz fazendo a compatibilização pela razão histórica entre a série original e a dessaz. 
 
 ```{r}
+arima_forecast = arimaUnivariate(df, end_forecast =  "2026-12-01")
 
-stl_projection = arimaUnivariate(df, end_projection = "2026-12-01")
+Seasonality_ratio = seas_ratio(df_original = df, df_dessaz = arima_forecast)
 
-Seasonality_ratio = seas_ratio(df_original = df, df_dessaz = stl_projection)
+# Organizando os dados dos modelos 
 
-ggplot(data = Seasonality_ratio)+
-       aes(x = date, y = vl)+
-       geom_line(size = 1.0)+
+Sratio_plots <- Seasonality_ratio %>% 
+                mutate(Original = vl) %>% 
+                filter(date >= "2010-01-01") %>% 
+                rename(Seasonality_ratio = vl) %>% 
+                pivot_longer(-c(date, forecast), 
+                          names_to = "Models") %>% 
+                filter((!forecast & Models == 'Original') |
+                      forecast & Models != 'Original')
+
+
+# Visualização dos resultados 
+
+ggplot(Sratio_plots) +
+       aes(x = date, y = value, colour = Models) +
+       geom_line(size = 1.0) +
+       scale_color_manual(
+       values = c(Original = "black",
+                Seasonality_ratio = "red")) +
        labs(x = "")+
        annotate("rect", xmin = max(df$date), 
-                        xmax = max(model_snaive$date),
-                        ymin = 0, ymax = Inf, alpha = 0.4) +
+                        xmax = max(arima_forecast$date),
+                        ymin = 150, ymax = Inf, alpha = 0.4) +
        theme_bw()+
        theme(legend.position = "bottom")
   
 
 ```
+#*Função drift_hist*: Incorpora tendência na projeção de uma série. Para calcular a tendência, utiliza a tendência linear presente no histórico da série.
+
+```{r}
+snaive_drift_hist = drift_hist(df_forecast = model_snaive_five, nyears = 5)
+```
+
+#*Função drift_manual*: Incorpora tendência na projeção de uma série. Para calcular a tendência, utiliza os valores fornecidos como sendo % de MoM a ser aplicado na projeção.
+
+```{r}
+snaive_drift_manual = drift_manual(df_forecast = model_snaive_five, manual_drift = c(0.1, 0.15))
+```
+
+#*Função drift_target*: Incorpora tendência na projeção de uma série. Para calcular a tendência, utiliza a diferença entre o último dado realizado e o valor alvo para o ano. Retorna uma lista 
+
+```{r}
+snaive_target = drift_target(df_forecast = model_snaive_five,
+                              target_value = c(150, 170), 
+                             trend_type = NULL)
+```
+#*Função check_vector_len*: Compara a quantidade de valores no vetor de input com o número necessário para fazer projeção utilizando o método drift.
+
+```{r}
+check_leng = check_vector_len(df_forecast = model_snaive_five,
+              vector_to_check = c(170,170))
+
+print(check_leng)
+```
+
+#*Função Drift*: Incorpora tendência na projeção de uma série. Drift histórico, manual e target 
+
+```{r}
+model_drift = drift(df = model_snaive_five, nyears = 5)
+
+model_drift_manual = drift(df = model_snaive_five, manual_drift = c(0.1, 0.15))
+
+model_drift_target = drift(df = model_snaive_five, target_value = check_leng)
+
+drift_plot <- model_drift %>% 
+              rename(model_drift_hist = vl) %>% 
+              full_join(select(model_drift_manual, date, vl), by = "date") %>% 
+              rename(drift_manual = vl) %>% 
+              full_join(select(model_drift_target, date, vl), by = "date") %>% 
+              rename(drift_target = vl) %>% 
+              relocate(forecast, .after = NULL) %>% 
+              mutate(Original = model_drift_hist) %>% 
+              filter(date >= "2010-01-01") %>% 
+              pivot_longer(-c(date, forecast), 
+                          names_to = "Models") %>% 
+                filter((!forecast & Models == 'Original') |
+                      forecast & Models != 'Original')
+
+
+drift_plot %>%
+          filter(!(Models %in% c("vl_old", "drift"))) %>%
+          ggplot() +
+          aes(x = date, y = value, colour = Models) +
+          geom_line(size = 1.0) +
+          scale_color_manual(
+               values = c(Original = "black",
+                          drift_manual = "red",
+                          drift_target = "yellow",
+                          model_drift_hist = "blue"
+                          )) +
+          labs(x = "")+
+          annotate("rect", xmin = max(df$date), 
+                           xmax = max(drift_plot$date),
+                           ymin = 150, ymax = Inf, alpha = 0.4) +
+          theme_bw()+
+          theme(legend.position = "bottom")
+
+```
+#*Função get_montly_forecast*: A partir de uma projeção para final de período anual, a função irá estimar os valores mensais desda última observação realizada até o valor alvo, mantendo a sazonalidade presente no histórico da série.
+
+```{r}
+models = get_montly_forecast(df,
+                             end_forecast = '2026-12-01',
+                             nyears = 5,
+                             target_value = c(170,170),
+                             trend_type = "linear")
+
+
+models %>% 
+  filter(date >= "2010-01-01") %>% 
+  ggplot() +
+       aes(x = date, y = vl) +
+       geom_line(size = 1.0) +
+            labs(x = "")+
+            annotate("rect", xmin = max(df$date), 
+                             xmax = max(arima_plot$date),
+                             ymin = 150, ymax = Inf, alpha = 0.4) +
+            theme_bw()+
+            theme(legend.position = "bottom")
+```
+
+
 

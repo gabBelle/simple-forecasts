@@ -51,6 +51,8 @@ split_series <- function(df, name_sid, type = 'ambos') {
   } else if (type == 'ambos') {
     df <- df %>%
       dplyr::select(date, vl, forecast)
+  }else{
+    stop("ERRO: Type selecionado incompatível!")
   }
 
   return(df)
