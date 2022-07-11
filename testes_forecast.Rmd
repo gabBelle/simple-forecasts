@@ -1,0 +1,215 @@
+---
+title: "Example Simple-forecasts"
+output: html_document
+---
+
+```{r}
+rm(list = ls()) # Limpar a memória 
+
+#Coleta o nome de usuário
+user <- Sys.getenv('USERNAME')
+user_path <- paste0('C:/Users/', user, '/')
+
+# Define os paths para cada usuário ---------------------------------------
+
+if(user == 'GabrielBelle') {
+  #Insira o caminho do arquivo de autentição do series.4macro 
+  auth_path <- paste0(user_path, 
+                      'Documents/Trabalhos/auth.ini')
+  
+  git_path <- paste0(user_path,
+                     'Documents/Trabalhos/git/')
+  
+  dre_sharepoint_path <- paste0(user_path,
+                                '4intelligence/Feature Store - Documentos/DRE/')
+}
+
+library(tidyverse)
+library(series.4macro)
+library(lubridate)
+library(fable)
+library(feasts)
+library(tsibble)
+library(seasonal)
+library(zoo)
+library(tsibbledata)
+library(purrr)
+
+set.seed(1)
+```
+
+```{r}
+source_files <- list.files(paste0(git_path,'simple-forecasts/R/'))
+
+for(file_name in source_files){
+  source(paste0(git_path,
+                'simple-forecasts/R/',
+                file_name))
+  }
+
+print(source_files)
+```
+
+### Projeções v1
+
+```{r}
+lista_4casthub_raw <- readxl::read_xlsx(paste0(
+  dre_sharepoint_path,
+  'prioritarias/lista_4casthub.xlsx'))
+```
+#### Clima - snaive
+
+```{r}
+clima_sid <- lista_4casthub_raw %>% 
+  filter(fonte == 'Nasa Power') %>% 
+  pluck('serie')
+```
+
+```{r}
+clima_data <- load_clean_series(clima_sid, auth_path)
+```
+
+```{r}
+exp_clima <- tibble()
+
+for (sid in sample(clima_sid,6)) {
+  print(sid)
+  
+  sid_data_raw <- split_series(clima_data, sid, 'realizado')
+  
+  clima_forecast <- snaive(sid_data_raw,
+                           nmeans = 5,
+                           end_projection = '2026-12-01') %>% 
+    mutate(sid = sid)
+  
+  #Pode mandar pra FS direto
+  
+  exp_clima <- exp_clima %>% 
+    bind_rows(clima_forecast)
+}
+```
+
+```{r}
+ggplot(exp_clima, aes(date, y = vl, color = forecast)) +
+  geom_line() +
+  facet_wrap(~sid, scale = 'free_y', ncol = 2)
+```
+#### Mensalização - LatamFocus
+
+
+##### Leliq Argentina
+```{r}
+leliq_fs <- load_clean_series('ARINR0006000OEMN', auth_path) %>% 
+  split_series('ARINR0006000OEMN', type = 'realizado')
+
+leliq_get_monthly <- leliq_fs %>% 
+  get_montly_forecast(end_projection = '2026-12-01',
+                      trend_type = 'exponential',
+                      target_value = c(52.79,47.38,41.01,35.36,29.71))
+```
+
+```{r}
+ggplot(leliq_get_monthly, aes(date, y = vl, color = forecast)) +
+  geom_line()
+```
+```{r}
+leliq_linear <- leliq_fs %>% 
+  naive(end_projection = '2026-12-01') %>% 
+  drift(target_value = c(52.79,47.38,41.01,35.36,29.71),
+        trend_type = 'exponential')
+```
+
+```{r}
+ggplot(leliq_linear, aes(date, y = vl, color = forecast)) +
+  geom_line()
+```
+
+##### Pib Argentina
+```{r}
+pib_fs <- load_clean_series('ARGDP0110000ROQL', auth_path) %>% 
+  split_series('ARGDP0110000ROQL', type = 'realizado')
+
+target_pib <- get_target_from_yoy(pib_fs, yoy = c(2.9,1.7,1.9,2.1,2.3))
+
+pib_seas <- pib_fs %>% 
+  get_montly_forecast(end_projection = '2026-12-01',
+                      trend_type = 'linear',
+                      target_value = target_pib)
+```
+
+```{r}
+ggplot(pib_seas, aes(date, y = vl)) +
+  geom_line() +
+  annotate("rect",
+           xmin = max(pib_fs$date),
+           xmax = max(pib_seas$date),
+           ymin = min(pib_fs$vl),
+           ymax = Inf,
+           alpha = 0.2)
+```
+```{r}
+leliq_linear <- leliq_fs %>% 
+  naive(end_projection = '2026-12-01') %>% 
+  drift(target_value = c(52.79,47.38,41.01,35.36,29.71),
+        trend_type = 'exponential')
+```
+
+```{r}
+ggplot(leliq_linear, aes(date, y = vl, color = forecast)) +
+  geom_line()
+```
+
+
+#### IPC
+
+```{r}
+ipc_fs <- load_clean_series('ARPRC0114000OOML', auth_path) %>% 
+  split_series('ARPRC0114000OOML', type = 'realizado')
+
+target_ipc <- get_target_from_yoy(ipc_fs,
+                                  yoy = c(68.5,55.1,43.6,34.7,25.7))
+
+ipc_seas <- ipc_fs %>% 
+  get_montly_forecast(end_projection = '2026-12-01',
+                      trend_type = 'linear',
+                      nmeans = 5,
+                      target_value = target_ipc)
+```
+
+```{r}
+ggplot(ipc_seas, aes(date, y = vl)) +
+  geom_line() +
+  annotate("rect",
+           xmin = max(ipc_fs$date),
+           xmax = max(ipc_seas$date),
+           ymin = min(ipc_fs$vl),
+           ymax = Inf,
+           alpha = 0.2)
+```
+#### Cambio ARS/USD
+
+```{r}
+cambio_fs <- load_clean_series('ARFXR0041000OEML', auth_path) %>% 
+  split_series('ARFXR0041000OEML', type = 'realizado')
+
+target_cambio <- c(158.48,233.57,342.4,458.24,574.08)
+
+cambio_seas  <- cambio_fs %>% 
+  get_montly_forecast(end_projection = '2026-12-01',
+                      trend_type = 'linear',
+                      nmeans = 5,
+                      target_value = target_cambio)
+```
+
+```{r}
+ggplot(cambio_seas, aes(date, y = vl)) +
+  geom_line() +
+  annotate("rect",
+           xmin = max(cambio_fs$date),
+           xmax = max(cambio_seas$date),
+           ymin = min(cambio_fs$vl),
+           ymax = Inf,
+           alpha = 0.2)
+```
+
+

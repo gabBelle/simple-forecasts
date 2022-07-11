@@ -52,8 +52,8 @@ seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
       purrr::pluck('month')
 
     date_filt <- date_filt %>%
-      dplyr::filter(year == min(year)) %>%
       dplyr::filter(month == month_last_date) %>%
+      dplyr::filter(year == min(year)) %>%
       purrr::pluck('date')
 
     hist_mean <- df_ratio %>%

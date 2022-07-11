@@ -38,6 +38,7 @@ expand_series <- function(df, end_forecast) {
       tibble(date = seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
                         as.Date(end_forecast),
                         by = periodicity$p_name)
+
              )
     ) %>%
     mutate(forecast = ifelse(is.na(forecast), T, forecast))
