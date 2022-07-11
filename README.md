@@ -1,7 +1,9 @@
 # Package simple-forecasts
 ## _Description_
 
+
 O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL).  
+
 
 ## _Installation_
 
@@ -20,6 +22,7 @@ remotes::install_github("")
 - **holtWinter** retorna o modelo Holt-Winters; 
 - **arimaUnivariate** retorna o modelo Auto ARIMA; 
 - **get_seas_adj** retorna a dessazonalização de uma série com as configurações automáticas do STL ou do X13, opcional retornar a média ou a mediana entre os dois métodos. 
+
 
 ## _Dependencies_
 
@@ -51,7 +54,6 @@ df <- split_series(df = load_clean, name_sid = "BRGDP0002000ROQL",
                    type = "realizado")
 ```
 O argumento **type** retorna a série realizado, projetado ou ambos
-
 
 - **get_perodicity**
 

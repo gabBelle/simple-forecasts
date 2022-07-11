@@ -71,13 +71,3 @@ lf_inflation <- function(df_real, df_nominal, sid, auth_path, index = NULL){
     return(data.frame(model_lf))
   
 }
-
-
-
-
-
-
-
-
-
-
