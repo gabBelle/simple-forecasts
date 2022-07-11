@@ -1,9 +1,3 @@
----
-title: "Example Simple-forecasts"
-output: html_document
----
-
-```{r}
 rm(list = ls()) # Limpar a memória 
 
 #Coleta o nome de usuário
@@ -448,6 +442,8 @@ models %>%
             theme_bw()+
             theme(legend.position = "bottom")
 ```
+
+
 
 
 
