@@ -4,7 +4,7 @@
 #' @description Retorna apenas uma série de um df contendo séries empilhadas.
 #' Pode ser útil como função auxiliar.
 #'
-#' @param df Dataframe contendo a base de dados a ser quebrada, mais detalhes abaixo;
+#' @param df Dataframe contendo a base de dados a ser quebrada;
 #' @param name_sid Chr contendo o nome da série a ser retornada;
 #' @param type Chr dizendo se deve retornar apenas a série realizada, projetada ou ambos.
 #'
@@ -22,7 +22,7 @@
 #' \dontrun{
 #' split_fs_series(df = cleaned_df,
 #'                 name_sid = 'BREMP0018000OOML'),
-#'                 type = 'realizado')
+#'                 type = 'ambos')
 #' }
 #'
 #' @export

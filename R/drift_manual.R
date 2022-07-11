@@ -38,6 +38,10 @@
 drift_manual <- function(df_forecast,
                          manual_drift) {
 
+  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   df_forecast <- df_forecast %>%
     dplyr::mutate(year = format(date, '%Y'))
 

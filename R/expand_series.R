@@ -5,7 +5,7 @@
 #' para ser preenchida na função de forecast.
 #'
 #' @param df DataFrame contendo uma linha com data e observação da série;
-#' @param end_projection Date informando quando a projeção encerra.
+#' @param end_forecast Date informando quando a projeção encerra.
 #'
 #' @author Gabriel Bellé
 #'
@@ -19,21 +19,26 @@
 #' @examples
 #' \dontrun{
 #' expand_series(df = df_series,
-#'               end_projection = '2026-12-01')
+#'               end_forecast = '2026-12-01')
 #' }
 #'
 #' @export
 
-expand_series <- function(df, end_projection) {
+expand_series <- function(df, end_forecast) {
 
+  if(!all(c('date', 'vl') %in% colnames(df))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   periodicity <- get_periodicity(df)
 
   df <- df %>%
     mutate(forecast = F) %>%
     bind_rows(
-      tibble(date = seq.Date(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
-                        as.Date(end_projection),
-                        by = 'month')
+      tibble(date = seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
+                        as.Date(end_forecast),
+                        by = periodicity$p_name)
+
              )
     ) %>%
     mutate(forecast = ifelse(is.na(forecast), T, forecast))
