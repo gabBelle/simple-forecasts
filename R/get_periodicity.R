@@ -17,9 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' split_fs_series(df = cleaned_df,
-#'                 name_sid = 'BREMP0018000OOML'),
-#'                 type = 'realizado')
+#' get_periodicity(df = cleaned_df)
 #' }
 #'
 #' @export

@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' check_vector_leng(df_forecast = df_forecast,
+#' check_vector_len(df_forecast = df_forecast,
 #'                   vector_to_check = target_value)
 #' }
 #'
@@ -30,6 +30,10 @@
 check_vector_len <- function(df_forecast,
                              vector_to_check) {
 
+  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
   #Qtd de anos para serem projetados (completos e incompletos)
   n_years <- df_forecast %>%
     dplyr::filter(forecast) %>%

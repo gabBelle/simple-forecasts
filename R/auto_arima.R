@@ -4,7 +4,7 @@
 #' @description Aplicação do método Auto.Arima para projeção  
 #'
 #' @param df DataFrame contendo a série limpa e organizada;
-#' @param end_projection representa a data final, último mês ou trimestre, da projeção; 
+#' @param end_forecast representa a data final, último mês ou trimestre, da projeção; 
 #'
 #' @author Luiz Paulo T. 
 #'
@@ -17,16 +17,21 @@
 #' @examples
 #' \dontrun{
 #' 
-#' arimaUnivariate(df, end_projection = "2023-12-01")
+#' arimaUnivariate(df, end_forecast = "2026-12-01")
 #'               
 #' }
 #'
 #' @export 
 
-arimaUnivariate <- function(df, end_projection){
+arimaUnivariate <- function(df, end_forecast){
 
+    if(!all(c('date', 'vl') %in% colnames(df))) {
+      stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  
+  }
+  
     serie <- expand_series(df,
-                           end_projection) # Chamando função expand_series 
+                           end_forecast) # Chamando função expand_series 
   
 # Modelando auto.arima  - automático      
     

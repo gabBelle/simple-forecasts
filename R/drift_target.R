@@ -43,6 +43,11 @@ drift_target <- function(df_forecast,
                          target_value,
                          trend_type) {
 
+  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+    stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+  
+  
   if(is.null(trend_type)) {
     trend_type = 'linear'
   }
