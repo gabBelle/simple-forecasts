@@ -41,6 +41,7 @@ load_clean_series <- function(sids, auth_path) {
       dt = dt %>%
         as.Date(),
       vl = as.numeric(vl),
+      sid = as.character(sid),
       forecast = ifelse(lbl == '', F, T)) %>%
     dplyr::arrange(sid, dt) %>%
     dplyr::rename(date = dt) %>%
