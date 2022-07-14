@@ -55,7 +55,8 @@ print(source_files)
 ```{r}
 lista_4casthub_raw <- readxl::read_xlsx(paste0(
   dre_sharepoint_path,
-  'prioritarias/lista_4casthub.xlsx'))
+  'prioritarias/lista_4casthub.xlsx')) %>% 
+  suppressWarnings()
 ```
 #### Clima - snaive
 
@@ -71,7 +72,6 @@ clima_data <- load_clean_series(clima_sid, auth_path)
 
 ```{r}
 exp_clima <- tibble()
-
 for (sid in sample(clima_sid,6)) {
   print(sid)
   
@@ -94,122 +94,198 @@ ggplot(exp_clima, aes(date, y = vl, color = forecast)) +
   geom_line() +
   facet_wrap(~sid, scale = 'free_y', ncol = 2)
 ```
+
+
 #### Mensalização - LatamFocus
 
-
-##### Leliq Argentina
 ```{r}
-leliq_fs <- load_clean_series('ARINR0006000OEMN', auth_path) %>% 
-  split_series('ARINR0006000OEMN', type = 'realizado')
-
-leliq_get_monthly <- leliq_fs %>% 
-  get_montly_forecast(end_projection = '2026-12-01',
-                      trend_type = 'exponential',
-                      target_value = c(52.79,47.38,41.01,35.36,29.71))
+aux_exp <- function(sid, target, yoy = F) {
+  fs_data <- load_clean_series(sid, auth_path) %>% 
+    split_series(sid, type = 'realizado')
+  
+  if(yoy) {
+    target <- get_target_from_yoy(fs_data, yoy = target)
+  } 
+  
+  forecast_data <- fs_data %>% 
+    get_montly_forecast(end_forecast = '2026-12-01',
+                        trend_type = 'linear',
+                        target_value = target)
+  
+  plot_forecast <- ggplot(forecast_data, aes(date, y = vl)) +
+    geom_line() +
+    annotate("rect",
+           xmin = max(fs_data$date),
+           xmax = max(forecast_data$date),
+           ymin = min(fs_data$vl),
+           ymax = Inf,
+           alpha = 0.2)
+  
+  return(list(
+    plot_forecast = plot_forecast,
+    forecast_data = forecast_data
+  ))
+}
 ```
 
-```{r}
-ggplot(leliq_get_monthly, aes(date, y = vl, color = forecast)) +
-  geom_line()
-```
-```{r}
-leliq_linear <- leliq_fs %>% 
-  naive(end_projection = '2026-12-01') %>% 
-  drift(target_value = c(52.79,47.38,41.01,35.36,29.71),
-        trend_type = 'exponential')
-```
-
-```{r}
-ggplot(leliq_linear, aes(date, y = vl, color = forecast)) +
-  geom_line()
-```
 
 ##### Pib Argentina
 ```{r}
-pib_fs <- load_clean_series('ARGDP0110000ROQL', auth_path) %>% 
-  split_series('ARGDP0110000ROQL', type = 'realizado')
+teste <- load_clean_series('ARFXR0041000OEML', auth_path) %>% 
+  split_series('ARFXR0041000OEML', type = 'realizado')
 
-target_pib <- get_target_from_yoy(pib_fs, yoy = c(2.9,1.7,1.9,2.1,2.3))
-
-pib_seas <- pib_fs %>% 
-  get_montly_forecast(end_projection = '2026-12-01',
-                      trend_type = 'linear',
-                      target_value = target_pib)
 ```
 
 ```{r}
-ggplot(pib_seas, aes(date, y = vl)) +
+tx_desemp <- load_clean_series(c('CLEMP0087000OOML',
+                               'COEMP0090000OOML',                             'PEEMP0089LI3OOML'), auth_path) %>% 
+  select(-forecast) %>% 
+  mutate(sid = as.character(sid))
+
+c('AREMP0085000OOQL','CLEMP0087000OOML',
+                               'COEMP0090000OOML','ECEMP0092000OOQL',
+                               'PEEMP0089LI3OOML')
+
+q <- tx_desemp %>% 
+  group_by(sid) %>% 
+  summarise(max = max(date))
+```
+
+```{r}
+ggplot(tx_desemp, aes(x = date, y = vl)) +
   geom_line() +
-  annotate("rect",
-           xmin = max(pib_fs$date),
-           xmax = max(pib_seas$date),
-           ymin = min(pib_fs$vl),
+  facet_wrap(~sid, ncol = 1, scale = 'free')
+```
+
+#### Top-down 
+
+##### PIM
+Extrativa e Transformação
+
+1° passo projetar as aberturas e coletar projeção da série geral
+```{r}
+pim_sids <- c('BRIND0001000OOML','BRIND0002000OOML','BRIND0003000OOML')
+
+pim_data <- load_clean_series(pim_sids, auth_path)
+
+pim_geral <- split_series(pim_data, 'BRIND0001000OOML', type = 'ambos') %>% 
+  filter(date <= '2026-12-01')
+
+pim_transf <- split_series(pim_data, 'BRIND0002000OOML', type = 'realizado') %>% 
+  snaive(nyears = NULL, end_forecast = '2026-12-01') %>% 
+  drift(nyears = NULL)
+
+pim_extrat <- split_series(pim_data, 'BRIND0003000OOML', type = 'realizado') %>% 
+  snaive(nyears = NULL, end_forecast = '2026-12-01') %>% 
+  drift(nyears = NULL)
+```
+
+```{r}
+ggplot(pim_geral, aes(date, y = vl)) +
+    geom_line() +
+    annotate("rect",
+           xmin = max(filter(pim_geral,!forecast)$date),
+           xmax = max(pim_geral$date),
+           ymin = min(filter(pim_geral,!forecast)$vl),
            ymax = Inf,
            alpha = 0.2)
 ```
+
 ```{r}
-leliq_linear <- leliq_fs %>% 
-  naive(end_projection = '2026-12-01') %>% 
-  drift(target_value = c(52.79,47.38,41.01,35.36,29.71),
-        trend_type = 'exponential')
+ggplot(pim_extrat, aes(date, y = vl)) +
+    geom_line() +
+    annotate("rect",
+           xmin = max(filter(pim_extrat,!forecast)$date),
+           xmax = max(pim_extrat$date),
+           ymin = min(filter(pim_extrat,!forecast)$vl),
+           ymax = Inf,
+           alpha = 0.2)
 ```
 
 ```{r}
-ggplot(leliq_linear, aes(date, y = vl, color = forecast)) +
+ggplot(pim_transf, aes(date, y = vl)) +
+    geom_line() +
+    annotate("rect",
+           xmin = max(filter(pim_transf,!forecast)$date),
+           xmax = max(pim_transf$date),
+           ymin = min(filter(pim_transf,!forecast)$vl),
+           ymax = Inf,
+           alpha = 0.2)
+```
+
+
+```{r}
+a <- top_down(pim_geral, pim_extrat, pim_transf,
+              down_weights = c(0.11, 0.89),
+              name_series = c('pim_geral', 'pim_extrativa', 'pim_transformacao'))
+```
+
+
+```{r}
+b <- top_down(target_agg = pim_geral,
+              filter(pim_extrat, !forecast),
+              filter(pim_transf, !forecast))
+
+colnames(b) <- c('date', 'forecast', pim_sids)
+```
+
+
+```{r}
+ggplot(b %>% 
+         pivot_longer(-c(date, forecast)) %>% 
+         filter(date>='2016-01-01'),
+       aes(x = date, y = value, color = name)) +
   geom_line()
 ```
 
-
-#### IPC
-
 ```{r}
-ipc_fs <- load_clean_series('ARPRC0114000OOML', auth_path) %>% 
-  split_series('ARPRC0114000OOML', type = 'realizado')
+pmc_sids <- c('BRIND0001000OOML', #Pim geral
+              'BRRTL0030000OOML','BRRTL0023000OOML','BRRTL0024000OOML',
+              'BRRTL0035000OOML','BRRTL0027000OOML','BRRTL0026000OOML',
+              'BRRTL0034000OOML')
 
-target_ipc <- get_target_from_yoy(ipc_fs,
-                                  yoy = c(68.5,55.1,43.6,34.7,25.7))
+pmc_data <- load_clean_series(pmc_sids, auth_path)
 
-ipc_seas <- ipc_fs %>% 
-  get_montly_forecast(end_projection = '2026-12-01',
-                      trend_type = 'linear',
-                      nmeans = 5,
-                      target_value = target_ipc)
+pmc_topdown <- top_down(
+  target_agg = split_series(pmc_data, 'BRIND0001000OOML', type = 'ambos') %>% 
+    filter(date <= '2026-12-01'),
+  split_series(pmc_data, 'BRRTL0030000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0023000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0024000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0035000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0027000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0026000OOML', type = 'realizado'),
+  split_series(pmc_data, 'BRRTL0034000OOML', type = 'realizado')
+  )
+
+colnames(pmc_topdown) <- c('date','forecast',pmc_sids)
 ```
 
+
 ```{r}
-ggplot(ipc_seas, aes(date, y = vl)) +
+plot_pmc <- pmc_topdown %>% 
+         pivot_longer(-c(date, forecast)) %>% 
+         filter(date>='2016-01-01')
+
+ggplot(plot_pmc,
+       aes(x = date, y = value)) +
   geom_line() +
+  facet_wrap(~name, scale = 'free_y') +
   annotate("rect",
-           xmin = max(ipc_fs$date),
-           xmax = max(ipc_seas$date),
-           ymin = min(ipc_fs$vl),
-           ymax = Inf,
-           alpha = 0.2)
-```
-#### Cambio ARS/USD
-
-```{r}
-cambio_fs <- load_clean_series('ARFXR0041000OEML', auth_path) %>% 
-  split_series('ARFXR0041000OEML', type = 'realizado')
-
-target_cambio <- c(158.48,233.57,342.4,458.24,574.08)
-
-cambio_seas  <- cambio_fs %>% 
-  get_montly_forecast(end_projection = '2026-12-01',
-                      trend_type = 'linear',
-                      nmeans = 5,
-                      target_value = target_cambio)
+         xmin = max(filter(plot_pmc,!forecast)$date),
+         xmax = max(plot_pmc$date),
+         ymin = min(filter(plot_pmc,!forecast)$value),
+         ymax = Inf,
+         alpha = 0.2)
 ```
 
-```{r}
-ggplot(cambio_seas, aes(date, y = vl)) +
-  geom_line() +
-  annotate("rect",
-           xmin = max(cambio_fs$date),
-           xmax = max(cambio_seas$date),
-           ymin = min(cambio_fs$vl),
-           ymax = Inf,
-           alpha = 0.2)
-```
+
+
+
+
+
+
+
+
 
 
