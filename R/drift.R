@@ -67,7 +67,7 @@ drift <- function(df_forecast,
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   df_forecast <- df_forecast %>%
     dplyr::mutate(date = as.Date(date))
 
@@ -118,6 +118,9 @@ drift <- function(df_forecast,
     df_out <- df_out %>%
       dplyr::mutate(vl = vl_old * drift)
   }
+
+  df_out <- df_out %>%
+    select(c(date, forecast, vl))
 
   return(df_out)
 }
