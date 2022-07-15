@@ -38,14 +38,18 @@ snaive <- function(df, nyears = NULL, end_forecast){
         as.numeric()
     )
 
+  serie <- expand_series(df,
+                         end_forecast) %>%
+    dplyr::mutate(month = lubridate::month(date))
+
   if (is.null(nyears)) {
     month_last_date <- df %>%
       dplyr::filter(date == max(date)) %>%
       purrr::pluck('month')
 
     date_filt <- df %>%
-      dplyr::filter(year == min(year)) %>%
       dplyr::filter(month == month_last_date) %>%
+      dplyr::filter(year == min(year)) %>%
       purrr::pluck('date')
 
     df <- df %>%
@@ -55,11 +59,6 @@ snaive <- function(df, nyears = NULL, end_forecast){
     df <- df %>%
       dplyr::filter(date >= max(date)- years(nyears))
   }
-
-
-  serie <- expand_series(df,
-                         end_forecast) %>%
-           dplyr::mutate(month = lubridate::month(date))
 
   base_date <- df %>%
     dplyr::group_by(month) %>%

@@ -35,7 +35,7 @@ drift_hist <- function(df_forecast,
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   df_hist <- df_forecast %>%
     dplyr::filter(!forecast)
 
@@ -50,12 +50,12 @@ drift_hist <- function(df_forecast,
 
     month_last_date <- date_filt %>%
       dplyr::filter(date == max(date)) %>%
-      purrr::pluck('month')
+      purrr::pluck('month',1)
 
     date_filt <- date_filt %>%
-      dplyr::filter(year == min(year)) %>%
       dplyr::filter(month == month_last_date) %>%
-      purrr::pluck('date')
+      dplyr::filter(year == min(year)) %>%
+      purrr::pluck('date',1)
 
     df_drift_default <- df_hist %>%
       dplyr::filter(date >= date_filt)
@@ -67,11 +67,11 @@ drift_hist <- function(df_forecast,
 
   start_vl <- df_drift_default %>%
     dplyr::filter(date == min(date)) %>%
-    purrr::pluck('vl')
+    purrr::pluck('vl',1)
 
   end_vl <- df_drift_default %>%
     dplyr::filter(date == max(date)) %>%
-    purrr::pluck('vl')
+    purrr::pluck('vl',1)
 
   len_dt <- df_drift_default %>%
     base::nrow()
