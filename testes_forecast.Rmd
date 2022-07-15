@@ -323,16 +323,585 @@ for (sid in unique(lista_data$sid)) {
 
 ```
 
-
+# Geral 
 
 ```{r}
 ggplot(filter(lista_forecast, date >= '2016-01-01'),
-       aes(x = date, y = value, color = name)) +
+       aes(x = date, y = value, colour = name)) +
   geom_line() +
   facet_wrap(~sid, scale = 'free')
 ```
 
+# ARIND0112000OOML - Produção de Automóveis
 
+
+```{r}
+#lista_forecast <- data.frame(lista_forecast)
+
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "seas_ratio", 
+                           "arima"))) %>%
+      filter(sid %in% "ARIND0112000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+
+```
+
+# ARRTL0037000OOML - ARG - Vendas de Veículos Automotivos
+
+```{r}
+
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "seas_ratio", 
+                           "arima"))) %>%
+      filter(sid %in% "ARRTL0037000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+
+```
+
+# BRCRD0066000OOML - Endividamento Familiar
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRCRD0066000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRLDG0034000OOML - Índice de Confiança da Construção
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRLDG0034000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRLDG0037000OOML - Nível de Utilização da Capacidade Instalada
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("seas_ratio", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRLDG0037000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRLDG0037000SOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("seas_ratio", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRLDG0037000SOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRPRC0170MA2OAML -  Preço Médio de Distribuição - Diesel Comum
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRPRC0170MA2OAML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRPRC0170MG2OAML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRPRC0170MG2OAML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRPRC0170SE1OAML 
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRPRC0170SE1OAML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRPRC0170SP2OAML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRPRC0170SP2OAML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# BRRTL0093000OOML - Índice Gfk-4E de Atividade no Varejo Eletroeletrônico
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "arima"))) %>%
+      filter(sid %in% "BRPRC0170SP2OAML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# CNEMP0114000OOQL - CN – Taxa de Desemprego
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "CNEMP0114000OOQL" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# CNPRC0177000OOMY - CN - Índice de Preços ao Consumidor
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "CNPRC0177000OOMY" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# COIND0137000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "seas_ratio", 
+                           "arima"))) %>%
+      filter(sid %in% "COIND0137000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# COLDG0027000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "seas_ratio", 
+                           "arima"))) %>%
+      filter(sid %in% "COLDG0027000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# COLDG0028000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "seas_ratio", 
+                           "arima"))) %>%
+      filter(sid %in% "COLDG0028000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# ECLDG0032000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "snaive_drift", 
+                           "arima"))) %>%
+      filter(sid %in% "ECLDG0032000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# ECRTL0088000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "snaive_drift", 
+                           "arima"))) %>%
+      filter(sid %in% "ECRTL0088000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+
+# ECRTL0089000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("seas_ratio", 
+                           "snaive_drift", 
+                           "arima"))) %>%
+      filter(sid %in% "ECRTL0089000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# EUEMP0113000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("seas_ratio", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "EUEMP0113000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# EUGDP0099000WOQM
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "EUGDP0099000WOQM" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# EUPRC0176000OOMY
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "EUPRC0176000OOMY" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXEMP0091000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "MXEMP0091000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXGDP0072000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "MXGDP0072000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXGDP0073000ROQE
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "MXGDP0073000ROQE" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXIND0155000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "holtwinters"))) %>%
+      filter(sid %in% "MXIND0155000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXIND0160000OOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "snaive_drift", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "MXIND0160000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# MXLDG0036000OOML
+
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("arima", 
+                           "holtwinters", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "MXLDG0036000OOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# USEMP0105000SOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "holtwinters", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "USEMP0105000SOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+
+# USGDP0101000WOQM
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("snaive_drift", 
+                           "arima", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "USGDP0101000WOQM" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# USLDG0047000SOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "arima", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "USLDG0047000SOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# USLDG0048000SOML
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "arima", 
+                           "seas_ratio"))) %>%
+      filter(sid %in% "USLDG0048000SOML" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
+
+# USPRC0001000OOMY
+
+
+```{r}
+lista_forecast %>%
+      filter(!(name %in% c("holtwinters", 
+                           "arima", 
+                           "snaive_drift"))) %>%
+      filter(sid %in% "USPRC0001000OOMY" & 
+             date >= "2016-01-01") %>%
+      ggplot() +
+      aes(x = date, y = value, colour = name) +
+      geom_line(size = 1.0) +
+      scale_color_hue(direction = 1) +
+      theme_minimal()+
+      theme(legend.position = "bottom")
+```
 
 
 
