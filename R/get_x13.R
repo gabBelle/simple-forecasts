@@ -4,7 +4,7 @@
 #' @description Calcula o dessaz de uma série com as configurações automáticas
 #' do X13.
 #'
-#' @param df série para dessazonalização 
+#' @param df série para dessazonalização
 #'
 #' @author Gabriel Bellé
 #'
@@ -26,7 +26,7 @@ get_x13 <- function(df) {
   if(!all(c('date', 'vl') %in% colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   periodicity <- get_periodicity(df)
 
   mo <- as.numeric(format(df$date[1], '%m'))
@@ -39,7 +39,9 @@ get_x13 <- function(df) {
     tibble::as_tibble() %>%
     dplyr::bind_cols(df$date) %>%
     dplyr::rename(x13 = 1,
-                  date = 2) %>% 
-    dplyr::relocate(date, .after = NULL)
+                  date = 2) %>%
+    dplyr::relocate(date, .after = NULL) %>%
+    mutate(x13 = as.numeric(x13))
+
   return(df_x13)
 }
