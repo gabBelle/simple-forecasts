@@ -181,57 +181,16 @@ pim_extrat <- split_series(pim_data, 'BRIND0003000OOML', type = 'realizado') %>%
 ```
 
 ```{r}
-ggplot(pim_geral, aes(date, y = vl)) +
-    geom_line() +
-    annotate("rect",
-           xmin = max(filter(pim_geral,!forecast)$date),
-           xmax = max(pim_geral$date),
-           ymin = min(filter(pim_geral,!forecast)$vl),
-           ymax = Inf,
-           alpha = 0.2)
-```
-
-```{r}
-ggplot(pim_extrat, aes(date, y = vl)) +
-    geom_line() +
-    annotate("rect",
-           xmin = max(filter(pim_extrat,!forecast)$date),
-           xmax = max(pim_extrat$date),
-           ymin = min(filter(pim_extrat,!forecast)$vl),
-           ymax = Inf,
-           alpha = 0.2)
-```
-
-```{r}
-ggplot(pim_transf, aes(date, y = vl)) +
-    geom_line() +
-    annotate("rect",
-           xmin = max(filter(pim_transf,!forecast)$date),
-           xmax = max(pim_transf$date),
-           ymin = min(filter(pim_transf,!forecast)$vl),
-           ymax = Inf,
-           alpha = 0.2)
-```
-
-
-```{r}
-a <- top_down(pim_geral, pim_extrat, pim_transf,
-              down_weights = c(0.11, 0.89),
-              name_series = c('pim_geral', 'pim_extrativa', 'pim_transformacao'))
-```
-
-
-```{r}
-b <- top_down(target_agg = pim_geral,
-              filter(pim_extrat, !forecast),
-              filter(pim_transf, !forecast))
+pim_topdown <- top_down(target_agg = pim_geral,
+                        filter(pim_extrat, !forecast),
+                        filter(pim_transf, !forecast))
 
 colnames(b) <- c('date', 'forecast', pim_sids)
 ```
 
 
 ```{r}
-ggplot(b %>% 
+ggplot(pim_topdown %>% 
          pivot_longer(-c(date, forecast)) %>% 
          filter(date>='2016-01-01'),
        aes(x = date, y = value, color = name)) +
@@ -261,6 +220,7 @@ pmc_topdown <- top_down(
 colnames(pmc_topdown) <- c('date','forecast',pmc_sids)
 ```
 
+##### PMC
 
 ```{r}
 plot_pmc <- pmc_topdown %>% 
@@ -284,6 +244,93 @@ ggplot(plot_pmc,
 
 
 
+
+
+
+
+
+
+
+
+#### Teste projeções naive
+
+```{r}
+lista_teste <- lista_4casthub_raw %>% 
+  filter(status == 'teste') %>% 
+  select(c(serie, nome_indicador))
+
+lista_data <- load_clean_series(lista_teste$serie, auth_path)
+end_forecast = '2026-01-01'
+
+lista_forecast <- tibble()
+for (sid in unique(lista_data$sid)) {
+  sid_data <- split_series(lista_data, sid, type = 'realizado') %>% 
+    mutate(forecast = F)
+  
+  #Detect gaps 
+  periodicity_sid <- get_periodicity(sid_data)
+  sid_gap <- sid_data %>% 
+    mutate(month = format(date, '%m') %>% 
+             as.numeric(),
+           diff_months = month - lag(month, 1)) %>% 
+    na.omit()
+  
+  if(any(sid_gap$diff_months > periodicity_sid$p_ngap)){
+    warning(paste0("O sid ", sid, "possui buracos na série!"))
+  } else {
+    #ERRO drift_hist para o sid = 'BRLDG0034000OOML'
+    sid_holt <- holtWinter(sid_data, end_forecast = end_forecast) %>% 
+      rename(holtwinters = vl) %>% 
+      filter(forecast) %>% 
+      pivot_longer(-c(date, forecast))
+    
+    sid_arima <- arimaUnivariate(sid_data, end_forecast = end_forecast) %>% 
+      rename(arima = vl) %>% 
+      filter(forecast) %>% 
+      pivot_longer(-c(date, forecast))
+    
+    sid_snaive_drift <- snaive(sid_data,
+                               nyears = 1, 
+                               end_forecast = end_forecast) %>% 
+      drift() %>% 
+      rename(snaive_drift = vl) %>% 
+      filter(forecast) %>% 
+      pivot_longer(-c(date, forecast))
+    
+    sid_seas_adj <- get_seas_adj(sid_data, type = 'STL') %>% 
+      naive(end_forecast = end_forecast) %>% 
+      drift()
+    
+    sid_seas_ratio <- seas_ratio(sid_data, sid_seas_adj, nyears = 5) %>% 
+      rename(seas_ratio = vl) %>% 
+      filter(forecast) %>% 
+      pivot_longer(-c(date, forecast))
+    
+    sid_data <- sid_data  %>% 
+      pivot_longer(-c(date, forecast))
+    
+    bind_forecasts <- sid_data %>% 
+      bind_rows(sid_holt,
+                sid_arima, 
+                sid_snaive_drift,
+                sid_seas_ratio) %>% 
+      mutate(sid = sid)
+    
+    lista_forecast <- lista_forecast %>% 
+      bind_rows(bind_forecasts)
+  }
+}
+
+```
+
+
+
+```{r}
+ggplot(filter(lista_forecast, date >= '2016-01-01'),
+       aes(x = date, y = value, color = name)) +
+  geom_line() +
+  facet_wrap(~sid, scale = 'free')
+```
 
 
 
