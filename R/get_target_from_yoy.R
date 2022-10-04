@@ -25,7 +25,8 @@
 #' @export
 
 get_target_from_yoy <- function(df,
-                                yoy) {
+                                yoy,
+                                end_forecast) {
 
   last_vl <- df %>%
     dplyr::mutate(
@@ -38,7 +39,11 @@ get_target_from_yoy <- function(df,
     dplyr::filter(year == max(year)) %>%
     pluck('vl')
 
-  target <- c(last_vl, yoy/100 + 1) %>%
+  df_forecast <- naive(df, end_forecast = end_forecast)
+
+  yoy_adj <- check_vector_len(df_forecast, yoy)
+
+  target <- c(last_vl, yoy_adj/100 + 1) %>%
     cumprod()
 
   target <- target[2:length(target)]

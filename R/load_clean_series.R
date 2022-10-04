@@ -25,9 +25,13 @@
 #'
 #' @export
 
-load_clean_series <- function(sids, auth_path) {
+load_clean_series <- function(sids, auth_path, estimate = NULL) {
 
-  query_data <- data.frame(sid = sids, force = T)
+  if(is.null(estimate)) {
+    query_data <- data.frame(sid = sids, force = T)
+  } else {
+    query_data <- data.frame(sid = sids, force = T, estimate = estimate)
+  }
 
   series_fs <- series.4macro::get_multi_series(query_data,
                                                filepath = auth_path,

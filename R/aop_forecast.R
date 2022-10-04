@@ -33,7 +33,7 @@
 #'
 #' @export
 
-aop_forecast <- function(df, end_forecast, target_aop) {
+aop_forecast <- function(df, end_forecast, target_aop, is_yoy = F) {
 
   periodicity <- get_periodicity(df)
 
@@ -43,7 +43,11 @@ aop_forecast <- function(df, end_forecast, target_aop) {
            month = format(date, '%m') %>% as.numeric())
 
   target_aop <- check_vector_len(df_forecast, target_aop)
-  target_yoy <- calc_yoy(df_forecast, target_aop)
+  if(is_yoy) {
+    target_yoy = target_aop
+  } else {
+    target_yoy <- calc_yoy(df_forecast, target_aop)
+  }
 
   months_by_year <- df_forecast %>%
     filter(forecast) %>%
@@ -104,6 +108,9 @@ aop_forecast <- function(df, end_forecast, target_aop) {
       mutate(vl = ifelse(date == dt, forecast_vl, vl))
 
   }
+
+  df_out <- df_out %>%
+    select(date, vl, forecast)
 
   return(df_out)
 
