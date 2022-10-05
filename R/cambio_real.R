@@ -47,8 +47,7 @@ cambio_real <- function(df, df_ipc_dom, df_ipc_int, mes_base) {
                 select(-forecast)) %>%
     na.omit()
 
-  cambio_base <- real[real$date == mes_base,]$cambio *
-    (real[real$date == mes_base, ]$ipc_int/real[real$date == mes_base,]$ipc_dom)
+  cambio_base <- real[real$date == mes_base,]$cambio
 
   forecast_dt <- min(min(filter(df, forecast)$date),
                      min(filter(df_ipc_dom, forecast)$date),
