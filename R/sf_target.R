@@ -1,20 +1,19 @@
-#' @title Montly Forecast
-#' @name get_montly_forecast
+#' @title Forecasting with target
+#' @name sf_target
 #'
-#' @description A partir de uma projeção para final de período anual, a função
-#' irá estimar os valores mensais desda última observação realizada até o valor alvo,
-#' mantendo a sazonalidade presente no histórico da série.
+#' @description Projeta uma série mensal ou trimestral, tendo como alvo um valor final, inserido manualmente.
+#' Mantém a sazonalidade histórica para os meses projetados.
+#' A função também lida com uma série que termina em qualquer mês do ano (Exp: último realizado 04/22, será completado os meses restantes até dezembro)
 #'
-#' É um wrapper nas funções: naive, seas_adj, seas_ratio, drift_target.
-#'
-#' Também realiza projeções de séries trimestrais.
+#' É um wrapper das funções: naive, seas_adj, seas_ratio, drift_target.
 #'
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada;
 #' @param end_forecast Data (YYYY-MM-DD) contendo o último mês a ser projetado;
+#' @param nyears Opcional, número de anos que será utilizado do histórico para as computações. Se não preenchido, usa o histórico inteiro.
 #' @param target_value Vetor de valores indicando a projeção desejada para final de período;
-#' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é linear.
+#' @param trend_type Tipo de tendência (linear ou exponential). Padrão é linear.
 #'
 #' @details
 #' O @param df de entrada deve conter pelo as colunas de:
@@ -27,28 +26,28 @@
 #'
 #' Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 #'
-#' @param type_drif o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
-#' alvo em target_value. Caso linear, a tendência será linear, caso exponencial, a tendência será exponencial.
+#' @param trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' alvo em target_value. Aceita os valores (linear, exponencial).
 #'
 #' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método naïve,
 #' e com a coluna forecast indicando quais observações são projeção.
 #'
 #' @examples
 #' \dontrun{
-#' get_montly_forecast <- function(df,
-#'                                 end_forecast = '2026-12-01',
-#'                                 nyears = 5,
-#'                                 target_value = c(180, 190, 195, 200),
-#'                                 trend_type = 'linear') {
+#' sf_target(df,
+#'           end_forecast = '2026-12-01',
+#'           nyears = 5,
+#'           target_value = c(180, 190, 195, 200),
+#'           trend_type = 'linear') {
 #' }
 #'
 #' @export
 
-get_montly_forecast <- function(df,
-                                end_forecast,
-                                nyears = NULL,
-                                target_value,
-                                trend_type = 'linear') {
+sf_target <- function(df,
+                      end_forecast,
+                      nyears = NULL,
+                      target_value,
+                      trend_type = 'linear') {
 
   #Realiza o dessaz
   df_seas_adj <- get_seas_adj(df, type = 'STL')

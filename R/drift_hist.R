@@ -18,8 +18,9 @@
 #' O @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
 #'
-#' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
-#' e uma coluna 'drift', indicando o valor da tendência para aquele período.
+#' @return O retorno é um df, contendo as colunas de:
+#' \code{date}; \code{vl}; \code{drift} e \code{forecast}.
+#' As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 #'
 #' @examples
 #' \dontrun{

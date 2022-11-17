@@ -2,12 +2,12 @@
 #' @name drift_manual
 #'
 #' @description Incorpora tendência na projeção de uma série.
-#' Para calcular a tendência, utiliza os valores fornecidos como sendo % de MoM a ser aplicado na projeção.
+#' Para calcular a tendência, utiliza os valores fornecidos, que devem ser % de MoM a ser aplicado na projeção.
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df_forecast Dataframe contendo a série a ser projetada;
-#' @param manual_drift Opcional, vetor de valores numéricos indicando drift em %;
+#' @param df_forecast Dataframe contendo a série projetada, a ser adicionada tendência;
+#' @param manual_drift Vetor de valores numéricos indicando drift em %;
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
@@ -24,8 +24,9 @@
 #'
 #' Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma % do valor em t + valor em t.
 #'
-#' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
-#' e uma coluna 'drift', indicando o valor da tendência para aquele período.
+#' @return O retorno é um df, contendo as colunas de:
+#' \code{date}; \code{vl}; \code{drift} e \code{forecast}.
+#' As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 #'
 #' @examples
 #' \dontrun{
@@ -41,7 +42,7 @@ drift_manual <- function(df_forecast,
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   df_forecast <- df_forecast %>%
     dplyr::mutate(year = format(date, '%Y'))
 

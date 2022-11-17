@@ -8,7 +8,6 @@
 #'
 #' @param df_forecast Dataframe contendo a série com o período de projeção calculado;
 #' @param vector_to_check Vetor contendo o alvo do drift ou os valores do drift manual.
-#' @param n_months Opcional, indica por quantos meses cada variação no vetor manual_drift será utilizado. Para série trimestral, quantos trimestres.
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
@@ -33,11 +32,11 @@ check_vector_len <- function(df_forecast,
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   #Qtd de anos para serem projetados (completos e incompletos)
   n_years <- df_forecast %>%
     dplyr::filter(forecast) %>%
-    mutate(year = format(date, '%Y')) %>%
+    dplyr::mutate(year = base::format(date, '%Y')) %>%
     purrr::pluck('year') %>%
     dplyr::n_distinct()
 
@@ -48,7 +47,7 @@ check_vector_len <- function(df_forecast,
 
   } else if (n_years > length(vector_to_check)) {
 
-    last_value <- tail(vector_to_check, 1)
+    last_value <- utils::tail(vector_to_check, 1)
     vector_to_check <- vector_to_check[1:n_years]
     vector_to_check <- ifelse(is.na(vector_to_check), last_value, vector_to_check)
 

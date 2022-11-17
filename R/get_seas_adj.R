@@ -5,15 +5,14 @@
 #' do STL ou do X13, opcional retornar a média dos dois.
 #'
 #' @param df Dataframe contendo a série a ser dessazonalizada;
-#' @param type tipo de dessaz a ser aplicado.
+#' @param type Chr especificando tipo de dessaz a ser aplicado (STL, X13, mean).
 #'
 #' @author Gabriel Bellé
 #'
-#' @details O input deve ser um df contendo pelo menos as colunas de:
+#' @details
+#' O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação.
-#'
-#' O type pode ser 'STL', 'X13' ou agregado pela média, 'mean'.
 #'
 #' @return O retorno é um df contendo os valores da série dessazonalidada e a data.
 #'

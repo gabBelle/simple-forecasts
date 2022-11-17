@@ -1,26 +1,31 @@
 #' @title Drift forecast
-#' @name drift
+#' @name sf_drift
 #'
 #' @description Incorpora tendência na projeção de uma série.
+#' Ou seja, dada uma série já com projeção, adiciona uma tendência.
 #'
-#' Métodos recomendados de projeção utilizados no input são:
-#' naive e seasonal naive
+#' Recomenda-se utilizar as seguintes funções para projetar o df de input:
+#' sf_naive e sf_seas_naive
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df_forecast Dataframe contendo a série a ser projetada;
-#' @param nyears Opcional, constante numérica;
-#' @param manual_drift Opcional, vetor de valores numéricos indicando drift em %;
+#' @param df_forecast Dataframe contendo a série já projetada, a ser adicionada tendência;
+#' @param nyears Opcional, constante numérica. X anos do histórico.
+#' @param manual_drift Opcional, vetor de valores numéricos indicando drift em % MoM;
 #' @param target_value Opcional, vetor de valores indicando a projeção desejada para final de período.
-#' @param type_drift Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.
+#' @param trend_type Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.
 #'
 #' @details
+#'
+#' Deve-se preencher apenas uma opção entre @param nyear, @param manual_drift e @param target_value
+#' As restantes devem ser mantidas como NULL.
+#'
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação;
 #' \code{forecast}: bool indicando se a observação é uma projeção.
 #'
-#' @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
+#' @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear/exponencial.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
 #'
 #' @param manual_drift deve conter um vetor numérico onde cada constante
@@ -38,31 +43,32 @@
 #'
 #' Isto fará com que a tendência seja tal qual respeite os valores objetivo.
 #'
-#' @param type_drif o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
-#' alvo em target_value. Caso linear, a tendência será linear, caso exponencial, a tendência será exponencial.
+#' @param trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' alvo em target_value. Aceita os valores (linear, exponencial).
 #'
-#' @return O retorno é o mesmo Dataframe de entrada. No entando, a coluna vl representa os valores adicionados de tendência.
-#' A coluna vl_old é incluída e contém a projeção anterior à modificação.
+#' @return O retorno é um Dataframe. A coluna 'vl' representa os valores adicionados de tendência.
+#' A coluna 'vl_old' é incluída e contém a projeção anterior à modificação.
 #'
 #' @examples
 #' \dontrun{
-#' drift(df = cleaned_df,
-#'       nyears = 5)
+#' sf_drift(df = cleaned_df,
+#'          nyears = 5)
 #'
-#' drift(df = cleaned_df,
-#'       manual_drift = c(0.1, 0.15))
+#' sf_drift(df = cleaned_df,
+#'          manual_drift = c(0.1, 0.15))
 #'
-#' drift(df = cleaned_df,
-#'       target_value = c(200, 230))
+#' sf_drift(df = cleaned_df,
+#'          target_value = c(200, 230),
+#'          trend_type = 'linear')
 #' }
 #'
 #' @export
 
-drift <- function(df_forecast,
-                  nyears = NULL,
-                  manual_drift = NULL,
-                  target_value = NULL,
-                  trend_type = NULL) {
+sf_drift <- function(df_forecast,
+                     nyears = NULL,
+                     manual_drift = NULL,
+                     target_value = NULL,
+                     trend_type = 'linear') {
 
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
@@ -71,13 +77,18 @@ drift <- function(df_forecast,
   df_forecast <- df_forecast %>%
     dplyr::mutate(date = as.Date(date))
 
-  #Checa se apenas 1 dos parâmetros opcionais está selecionado
-  #Caso todos estejam como NULL o padrão é usar o histórico para calcular
-  #A tendência
-  if(!is.null(manual_drift)) {
-    if(!is.null(target_value)) {
-      stop("Escolha apenas 1 método de drift!")
-    } else if(!is.null(nyears)){
+  if(any(!is.null(nyears), !is.null(manual_drift), !is.null(target_value))) {
+    a = 0
+    if(!is.null(nyears)) {
+      a = a + 1
+    }
+    if(!is.null(manual_drift)){
+      a = a + 1
+    }
+    if(!is.null(target_value)){
+      a = a + 1
+    }
+    if(a > 1) {
       stop("Escolha apenas 1 método de drift!")
     }
   }

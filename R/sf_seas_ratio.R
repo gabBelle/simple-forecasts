@@ -1,7 +1,7 @@
 #' @title Seasonality ratio
-#' @name seas_ratio
+#' @name sf_seas_ratio
 #'
-#' @description Realiza a projeção de uma série original usando a projeção de uma série dessaz
+#' @description Realiza a projeção de uma série original usando a projeção de sua série dessaz,
 #' fazendo a compatibilização pela razão histórica entre a série original e a dessaz.
 #'
 #' Caso seja fornecido uma série dessaz sem projeção, o retorno passa a ser apenas o fator sazonal histórico médio.
@@ -10,25 +10,30 @@
 #'
 #' @param df_original Dataframe de entrada com a série original;
 #' @param df_dessaz Dataframe de entrada com a série dessaz e a projeção já realizada até horizonte desejado;
-#' @param nyears Opcional, número de anos que será utilizado do histórico para as computações.
+#' @param nyears Opcional, número de anos que será utilizado do histórico para as computações. Se não preenchido, usa o histórico inteiro.
+#'
+#' @details
+#' Tanto o @param df_original quanto o @param df_dessaz, devem possuir as seguintes colunas:
+#' \code{date}: Data da observação:
+#' \code{vl}: valor da observação.
 #'
 #' @return Pode ser o mesmo df_original com a projeção ou apenas o histórico média do fator sazonal.
 #'
 #' @examples
 #' \dontrun{
-#' seas_ratio(df_original = df_cleaned,
-#'            df_dessaz = df_forecast_dessaz,
-#'            nyears = 5)
+#' sf_seas_ratio(df_original = df_cleaned,
+#'               df_dessaz = df_forecast_dessaz,
+#'               nyears = 5)
 #' }
 #'
 #' @export
 
-seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
+sf_seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
 
   if(!all(c('date', 'vl') %in% colnames(df_original))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   df_ratio = df_original %>%
     dplyr::rename(original = vl) %>%
     dplyr::right_join(df_dessaz %>%

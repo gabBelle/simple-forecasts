@@ -1,8 +1,8 @@
 #' @title Calculate yoy from target value
 #' @name calc_yoy
 #'
-#' @description A função realiza a conversão de um target em valores, mesma unidade de medida que o dataframe de interesse,
-#' para valores em Year over Year (YoY).
+#' @description Converte um vetor de valores, que estão na mesma unidade de medida da séries, e representam a média de um período futuro
+#' para a série, em um vetor contendo variações YoY entre os anos.
 #'
 #' @author Gabriel Bellé
 #'
@@ -19,7 +19,7 @@
 #' target_aop = c(0.15,0.12)
 #'
 #' @return Retorna um vetor de valores de mesmo cumprimento de @param target_aop,
-#' porém com os valores representando o YoY para ser aplicado nos meses do período.
+#' porém com os valores representando o YoY para o ano.
 #'
 #' @examples
 #' \dontrun{
@@ -32,20 +32,20 @@
 calc_yoy <- function(df, target_aop) {
 
   df <- df %>%
-    filter(!forecast) %>%
-    mutate(year = format(date, '%Y') %>% as.numeric(),
-           month = format(date, '%m') %>% as.numeric())
+    dplyr::filter(!forecast) %>%
+    dplyr::mutate(year = format(date, '%Y') %>% as.numeric(),
+                  month = format(date, '%m') %>% as.numeric())
 
   last_finished_year <- df %>%
-    filter(month == max(month)) %>%
-    filter(year == max(year)) %>%
-    pluck('year')
+    dplyr::filter(month == max(month)) %>%
+    dplyr::filter(year == max(year)) %>%
+    purrr::pluck('year')
 
   mean_last_year <- df %>%
-    filter(year == last_finished_year) %>%
-    group_by(year) %>%
-    summarise(mean = mean(vl)) %>%
-    pluck('mean')
+    dplyr::filter(year == last_finished_year) %>%
+    dplyr::group_by(year) %>%
+    dplyr::summarise(mean = mean(vl)) %>%
+    purrr::pluck('mean')
 
   target_yoy <- c(mean_last_year, target_aop)
   target_yoy <- target_yoy/lag(target_yoy,1) - 1

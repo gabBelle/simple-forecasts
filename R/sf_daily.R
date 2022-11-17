@@ -1,43 +1,41 @@
-#' @title Calculate yoy from target value
-#' @name calc_yoy
+#' @title Daily interpolation
+#' @name sf_daily
 #'
-#' @description A função realiza a conversão de um target em valores, mesma unidade de medida que o dataframe de interesse,
-#' para valores em Year over Year (YoY).
+#' @description Realiza a projeção de uma série diária, com base em uma série mensal já com projeção.
+#' O último dia da série diária será igual ao valor da série mensal fornecida.
+#' A interpolação feita é a linear, baseada nas funções 'naive' e 'drift_target'.
+#' A projeção da série diária considera apenas os dias úteis, seguindo calendário da Anbima.
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df Dataframe contendo a série limpa e organizada;
-#' @param target_aop Vetor de valores indicando a projeção desejada para média de período;
+#' @param target Dataframe contendo a série limpa e organizada, mensal e com projeção que será o alvo da projeção diária;
+#' @param ... Dataframe, N dfs que serão projetados utilizando a projeção contida em target
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
+#' O @param target de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação;
 #'
-#' O @param target_aop indica o valor para média de período desejado, idealmete advindo de uma projeção anual.
-#' Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
-#' target_aop = c(0.15,0.12)
-#'
-#' @return Retorna um vetor de valores de mesmo cumprimento de @param target_aop,
-#' porém com os valores representando o YoY para ser aplicado nos meses do período.
+#' @return Retorna um dataframe com colunas de \code{date}, \code{forecast} e uma
+#' coluna de valor para cada série que foi projetada, na mesma ordem em que foi inputada na função.
 #'
 #' @examples
 #' \dontrun{
-#' calc_yoy <- function(df,
-#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5)) {
+#' sf_daily(target = cambio_real_mensal,
+#'          cambio_diario_venda, cambio_diario_compra) {
 #' }
 #'
 #' @export
 
-daily_from_monthly <- function(target, ...) {
+sf_daily <- function(target, ...) {
+
+  if('forecast' %in% colnames(target)) {
+    target <- target %>%
+      dplyr::select(-forecast)
+  }
 
   df_diario <- list(...) %>%
     purrr::reduce(left_join, by = 'date')
-
-  #return(df_diario)}
-
-  #df_diario = dolar_forecast
-  #df_diario = dolar_forecast %>% filter(date >= '2022-01-01')
 
   cal_br <- bizdays::create.calendar("Brazil/ANBIMA",
                                      bizdays::holidays("Brazil/ANBIMA"),
@@ -49,8 +47,7 @@ daily_from_monthly <- function(target, ...) {
            date = as.Date(date, origin = '1970-01-01'),
            date = bizdays::adjust.previous(date,cal_br)) %>%
     filter(date>max(df_diario$date)) %>%
-    rename(target_vl = vl) %>%
-    select(-forecast)
+    rename(target_vl = vl)
 
   daily_dates <- bizdays::bizseq(max(df_diario$date)+1,
                                  max(df_target$date),

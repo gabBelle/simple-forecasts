@@ -1,30 +1,29 @@
-#' @title Calculate yoy from target value
-#' @name calc_yoy
+#' @title Calculate real values exchange rate
+#' @name cambio_real
 #'
-#' @description A função realiza a conversão de um target em valores, mesma unidade de medida que o dataframe de interesse,
-#' para valores em Year over Year (YoY).
+#' @description A função calcula o câmbio ajustado pela inflação das moedas computadas em sua taxa, câmbio real.
 #'
 #' @author Gabriel Bellé
 #'
-#' @param df Dataframe contendo a série limpa e organizada;
-#' @param target_aop Vetor de valores indicando a projeção desejada para média de período;
+#' @param df Dataframe contendo a série de câmbio limpa e organizada;
+#' @param df_ipca_dom Dataframe contendo a série de inflação da moeda doméstica;
+#' @param df_ipc_int Dataframe contendo a série de inflação da moeda estrangeira;
+#' @param mes_base Ano e mês base para o câmbio real.
 #'
 #' @details
 #' O @param df de entrada deve conter pelo as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação;
 #'
-#' O @param target_aop indica o valor para média de período desejado, idealmete advindo de uma projeção anual.
-#' Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
-#' target_aop = c(0.15,0.12)
-#'
-#' @return Retorna um vetor de valores de mesmo cumprimento de @param target_aop,
-#' porém com os valores representando o YoY para ser aplicado nos meses do período.
+#' @return Retorna um dataframe contendo o câmbio real.
 #'
 #' @examples
 #' \dontrun{
-#' calc_yoy <- function(df,
-#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5)) {
+#' cambio_real(real_usd, #BRL/USD
+#'             ipca_br,
+#'             ipc_us,
+#'             '2022-01-01'
+#'             ))
 #' }
 #'
 #' @export

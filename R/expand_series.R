@@ -1,8 +1,8 @@
 #' @title Expand date span in a time series
 #' @name expand_series
 #'
-#' @description Aumenta o vetor de datas de um dataframe, inputando NAs na coluna de observação,
-#' para ser preenchida na função de forecast.
+#' @description Aumenta o vetor de date de um dataframe, inputando NAs na coluna de observação,
+#' para ser preenchida por uma função de forecast.
 #'
 #' @param df DataFrame contendo uma linha com data e observação da série;
 #' @param end_forecast Date informando quando a projeção encerra.
@@ -26,22 +26,19 @@
 
 expand_series <- function(df, end_forecast) {
 
-  if(!all(c('date', 'vl') %in% colnames(df))) {
+  if(!all(c('date', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
+
   periodicity <- get_periodicity(df)
 
   df <- df %>%
-    mutate(forecast = F) %>%
-    bind_rows(
-      tibble(date = seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
-                        as.Date(end_forecast),
-                        by = periodicity$p_name)
-
-             )
-    ) %>%
-    mutate(forecast = ifelse(is.na(forecast), T, forecast))
+    dplyr::mutate(forecast = F) %>%
+    dplyr::bind_rows(
+      dplyr::tibble(date = base::seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
+                                     as.Date(end_forecast),
+                                     by = periodicity$p_name))) %>%
+    dplyr::mutate(forecast = ifelse(base::is.na(forecast), T, forecast))
 
   return(df)
 }

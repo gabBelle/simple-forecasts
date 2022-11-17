@@ -1,10 +1,8 @@
 #' @title Average of period forecasting
-#' @name aop_forecast
+#' @name sf_aop
 #'
-#' @description A função projeta uma série a partir de um projeção anual contendo média
-#' para o período.
-#' O método é manter o mesmo YoY que a projeção anual, mas mantendo a sazonalidade.
-#' O YoY médio é aplicado a cada um dos meses a ser projetado, resultando em um valor médio igual ao alvo.
+#' @description A projeção é realizada utilizando um input manual, que deve corresponder ao YoY médio para o ano.
+#' A função ajusta o YoY para os meses restantes do ano, levando em conta os dados realizados, para que o YoY médio corresponda ao input.
 #'
 #' @author Gabriel Bellé
 #'
@@ -19,21 +17,21 @@
 #'
 #' O @param target_aop indica o valor para média de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
-#' target_aop = c(0.15,0.12)
+#' target_aop = c(0.15,0.12). Caso a quantidade de valores seja menor que o número de anos a ser projetado, repete-se o último valor.
 #'
 #' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método,
 #' e com a coluna forecast indicando quais observações são projeção.
 #'
 #' @examples
 #' \dontrun{
-#' target_aop <- function(df,
-#'                        end_forecast = '2026-12-01',
-#'                        target_aop = c(11.5,10.5,10.1,9.8,9.5)) {
+#' sf_aop(df, end_forecast = '2026-12-01',
+#'        target_aop = c(11.5,10.5,10.1,9.8,9.5)
+#'        )
 #' }
 #'
 #' @export
 
-aop_forecast <- function(df, end_forecast, target_aop, is_yoy = F) {
+sf_aop <- function(df, end_forecast, target_aop, is_yoy = F) {
 
   periodicity <- get_periodicity(df)
 

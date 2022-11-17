@@ -11,7 +11,7 @@
 #'
 #' @param df_forecast Dataframe contendo a série a ser projetada;
 #' @param target_value Vetor de valores indicando a projeção desejada para final de período;
-#' @param trend_type Opcional, linear ou exponential. Utilizado apenas quando target_value é chamado. Padrão é exponential.
+#' @param trend_type Tipo de tendência (linear ou exponential).
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
@@ -25,11 +25,12 @@
 #'
 #' Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 #'
-#' @param type_drif o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
-#' alvo em target_value. Caso linear, a tendência será linear, caso exponencial, a tendência será exponencial.
+#' @param trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' alvo em target_value. Aceita os valores (linear, exponencial).
 #'
-#' @return O retorno é um df, com as colunas de date, indo até o fim da projeção,
-#' e uma coluna 'drift', indicando o valor da tendência para aquele período.
+#' @return O retorno é um df, contendo as colunas de:
+#' \code{date}; \code{vl}; \code{drift} e \code{forecast}.
+#' As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 #'
 #' @examples
 #' \dontrun{
@@ -41,13 +42,13 @@
 
 drift_target <- function(df_forecast,
                          target_value,
-                         trend_type) {
+                         trend_type = NULL) {
 
   if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
-  
-  
+
+
   if(is.null(trend_type)) {
     trend_type = 'linear'
   }

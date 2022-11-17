@@ -12,7 +12,7 @@
 #' para que fiquem no formato de \code{tibble}, empiladas e indicando onde é a projeção.
 #'
 #' @return O retorno é um df contendo as colunas:
-#' \code{sid}: SériesID da série;
+#' \code{sid}: SeriesID da série;
 #' \code{date}: Data da observação:
 #' \code{forecast}: TRUE quando a observação for uma projeção;
 #' \code{vl}: valor da observação.

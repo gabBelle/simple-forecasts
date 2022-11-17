@@ -1,31 +1,31 @@
 #' @title Seasonal naïve method
-#' @name snaive
+#' @name sf_snaive
 #'
-#' @description Aplicação do método Seasonal naïve, no qual cada previsão é igual ao último valor observado da mesma estação (por exemplo, o mesmo mês do ano anterior) ou a média dos anos escolhida;
+#' @description Método Seasonal Naïve, no qual cada previsão é igual ao último valor observado da mesma estação
+#' (por exemplo, o mesmo mês do ano anterior) ou a média dos meses de X anos.
 #'
 #' @param df DataFrame contendo a série limpa e organizada;
-#' @param nyears Numérico indicando o número de anos para aplicar a média;
-#' @param end_forecast representa a data final para a projeção;
-#' @param drift aplicação de drift. Default é FALSE
-#'
+#' @param nyears Opcional, número de anos que será utilizado do histórico para as computações. Se não preenchido, usa o histórico inteiro.
+#' @param end_forecast Chr representa a data final para a projeção;
 #'
 #' @author Luiz Paulo T.
 #'
-#' @details O input deve ser um data.frame organizado:
+#' @details
+#' O @param df de entrada deve conter, pelo menos, as colunas de:
 #' \code{date}: Data da observação:
 #' \code{vl}: valor da observação.
 #'
-#' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método Seasonal naïve
+#' @return Retorna o mesmo df de input, porém com a projeção Seasonal naïve.
 #'
 #' @examples
 #' \dontrun{
-#' snaive(df, nyears = 1, end_forecast = "2026-12-01")
+#' sf_snaive(df, nyears = 1, end_forecast = "2026-12-01")
 #'
 #' }
 #'
 #' @export
 
-snaive <- function(df, nyears = NULL, end_forecast){
+sf_snaive <- function(df, nyears = NULL, end_forecast){
   if(!all(c('date', 'vl') %in% colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
@@ -57,7 +57,7 @@ snaive <- function(df, nyears = NULL, end_forecast){
 
   } else {
     df <- df %>%
-      dplyr::filter(date >= max(date)- years(nyears))
+      dplyr::filter(date >= max(date) - years(nyears))
   }
 
   base_date <- df %>%
