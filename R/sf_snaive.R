@@ -26,16 +26,16 @@
 #' @export
 
 sf_snaive <- function(df, nyears = NULL, end_forecast){
-  if(!all(c('date', 'vl') %in% colnames(df))) {
+  if(!all(c('date', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
   df <- df %>%
     dplyr::mutate(
-      year = format(date, '%Y') %>%
-        as.numeric(),
-      month = format(date, '%m') %>%
-        as.numeric()
+      year = base::format(date, '%Y') %>%
+        base::as.numeric(),
+      month = base::format(date, '%m') %>%
+        base::as.numeric()
     )
 
   serie <- expand_series(df,
@@ -44,12 +44,12 @@ sf_snaive <- function(df, nyears = NULL, end_forecast){
 
   if (is.null(nyears)) {
     month_last_date <- df %>%
-      dplyr::filter(date == max(date)) %>%
+      dplyr::filter(date == base::max(date)) %>%
       purrr::pluck('month')
 
     date_filt <- df %>%
       dplyr::filter(month == month_last_date) %>%
-      dplyr::filter(year == min(year)) %>%
+      dplyr::filter(year == base::min(year)) %>%
       purrr::pluck('date')
 
     df <- df %>%
@@ -57,7 +57,7 @@ sf_snaive <- function(df, nyears = NULL, end_forecast){
 
   } else {
     df <- df %>%
-      dplyr::filter(date >= max(date) - years(nyears))
+      dplyr::filter(date >= base::max(date) - lubridate::years(nyears))
   }
 
   base_date <- df %>%
@@ -67,11 +67,11 @@ sf_snaive <- function(df, nyears = NULL, end_forecast){
 
   output <- serie %>%
     dplyr::left_join(base_date) %>%
-    dplyr::mutate(vl = ifelse(is.na(vl), vl_mean, vl)) %>%
+    dplyr::mutate(vl = ifelse(base::is.na(vl), vl_mean, vl)) %>%
     dplyr::select(date, vl) %>%
-    dplyr::full_join(select(serie, date, forecast), by = "date")
+    dplyr::full_join(dplyr::select(serie, date, forecast), by = "date")
 
-  return(data.frame(output))
+  return(base::data.frame(output))
 }
 
 

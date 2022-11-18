@@ -39,12 +39,12 @@
 drift_manual <- function(df_forecast,
                          manual_drift) {
 
-  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+  if(!all(c('date', 'forecast', 'vl') %in% base::colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
   df_forecast <- df_forecast %>%
-    dplyr::mutate(year = format(date, '%Y'))
+    dplyr::mutate(year = base::format(date, '%Y'))
 
   manual_drift_adj <- check_vector_len(df_forecast = df_forecast,
                                        vector_to_check = manual_drift)
@@ -61,8 +61,8 @@ drift_manual <- function(df_forecast,
     dplyr::left_join(depara_year_manual) %>%
     dplyr::mutate(
       drift = drift / 100 + 1,
-      drift = ifelse(forecast, drift, 1),
-      drift = cumprod(drift)) %>%
+      drift = base::ifelse(forecast, drift, 1),
+      drift = base::cumprod(drift)) %>%
     dplyr::select(c(date, vl, drift, forecast))
 
   return(df_forecast)

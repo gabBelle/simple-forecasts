@@ -29,7 +29,7 @@
 check_vector_len <- function(df_forecast,
                              vector_to_check) {
 
-  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+  if(!all(c('date', 'forecast', 'vl') %in% base::colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
@@ -40,16 +40,16 @@ check_vector_len <- function(df_forecast,
     purrr::pluck('year') %>%
     dplyr::n_distinct()
 
-  if(n_years < length(vector_to_check)) {
+  if(n_years < base::length(vector_to_check)) {
     warning('Para estimar a tendencia foi fornecido um vetor maior que o necessario! O excesso sera truncado.')
 
     vector_to_check <- vector_to_check[1:n_years]
 
-  } else if (n_years > length(vector_to_check)) {
+  } else if (n_years > base::length(vector_to_check)) {
 
     last_value <- utils::tail(vector_to_check, 1)
     vector_to_check <- vector_to_check[1:n_years]
-    vector_to_check <- ifelse(is.na(vector_to_check), last_value, vector_to_check)
+    vector_to_check <- base::(is.na(vector_to_check), last_value, vector_to_check)
 
   } else {
     vector_to_check <- vector_to_check

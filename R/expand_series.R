@@ -35,8 +35,8 @@ expand_series <- function(df, end_forecast) {
   df <- df %>%
     dplyr::mutate(forecast = F) %>%
     dplyr::bind_rows(
-      dplyr::tibble(date = base::seq(max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
-                                     as.Date(end_forecast),
+      dplyr::tibble(date = base::seq(base::max(df$date) %m+% months(periodicity$p_ngap), #Lubridate
+                                     base::as.Date(end_forecast),
                                      by = periodicity$p_name))) %>%
     dplyr::mutate(forecast = ifelse(base::is.na(forecast), T, forecast))
 

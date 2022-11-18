@@ -29,11 +29,11 @@
 
 sf_conversao_cambio <- function(df, df_target, df_ratio) {
 
-  if('forecast' %in% colnames(df)) {
+  if('forecast' %in% base::colnames(df)) {
     df <- df %>%
       dplyr::filter(!forecast)
   }
-  if('forecast' %in% colnames(df_target)) {
+  if('forecast' %in% base::colnames(df_target)) {
     df_target <- df_target %>%
       dplyr::filter(forecast)
   }

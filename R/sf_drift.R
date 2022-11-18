@@ -70,22 +70,22 @@ sf_drift <- function(df_forecast,
                      target_value = NULL,
                      trend_type = 'linear') {
 
-  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+  if(!all(c('date', 'forecast', 'vl') %in% base::colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
   df_forecast <- df_forecast %>%
-    dplyr::mutate(date = as.Date(date))
+    dplyr::mutate(date = base::as.Date(date))
 
-  if(any(!is.null(nyears), !is.null(manual_drift), !is.null(target_value))) {
+  if(base::any(!base::is.null(nyears), !base::is.null(manual_drift), !base::is.null(target_value))) {
     a = 0
-    if(!is.null(nyears)) {
+    if(!base::is.null(nyears)) {
       a = a + 1
     }
-    if(!is.null(manual_drift)){
+    if(!base::is.null(manual_drift)){
       a = a + 1
     }
-    if(!is.null(target_value)){
+    if(!base::is.null(target_value)){
       a = a + 1
     }
     if(a > 1) {
@@ -93,7 +93,7 @@ sf_drift <- function(df_forecast,
     }
   }
 
-  if(!is.null(manual_drift)) {
+  if(!base::is.null(manual_drift)) {
 
     drift_manual_out <- drift_manual(df_forecast = df_forecast,
                                      manual_drift = manual_drift)
@@ -101,7 +101,7 @@ sf_drift <- function(df_forecast,
     df_drift = drift_manual_out
     type_drift = 'mult'
 
-  } else if(!is.null(target_value)) {
+  } else if(!base::is.null(target_value)) {
 
     drift_target_out <- drift_target(df_forecast = df_forecast,
                                      target_value = target_value,
@@ -131,7 +131,7 @@ sf_drift <- function(df_forecast,
   }
 
   df_out <- df_out %>%
-    select(c(date, forecast, vl))
+    dplyr::select(c(date, forecast, vl))
 
   return(df_out)
 }
