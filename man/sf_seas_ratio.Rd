@@ -24,15 +24,13 @@ Caso seja fornecido uma série dessaz sem projeção, o retorno passa a ser apen
 }
 \details{
 Tanto o @param df_original quanto o @param df_dessaz, devem possuir as seguintes colunas:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 sf_seas_ratio(df_original = df_cleaned,
               df_dessaz = df_forecast_dessaz,
               nyears = 5)
-}
 
 }
 \author{

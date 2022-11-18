@@ -23,14 +23,11 @@ Aplicação do método Holt-Winters para projeção
 As opções de type são multiplicative, additive, trend e NULL. O quais representam, respectivamente: sazonalidade mutiplicativa e aditiva, o modelo Holt-Winters com tendência e, por fim, NULL representa o default, isto é, a escolha automática via critério de informação.
 
 O input deve ser um data.frame limpo e organizado:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 sf_hw(df, type = NULL, end_forecast = "2026-12-01")
-
-}
 
 }
 \author{

@@ -20,13 +20,11 @@ do STL ou do X13, opcional retornar a média dos dois.
 }
 \details{
 O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 get_seas_adj(df = cleaned_df, type = 'median')
-}
 
 }
 \author{

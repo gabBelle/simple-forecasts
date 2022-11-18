@@ -31,8 +31,8 @@ A função também lida com uma série que termina em qualquer mês do ano (Exp:
 }
 \details{
 O @param df de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 
 O @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
@@ -41,13 +41,11 @@ end_projection = '2025-12-01' e target_value = c(150, 200)
 Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 }
 \examples{
-\dontrun{
 sf_target(df,
           end_forecast = '2026-12-01',
           nyears = 5,
           target_value = c(180, 190, 195, 200),
           trend_type = 'linear')
-}
 
 }
 \author{

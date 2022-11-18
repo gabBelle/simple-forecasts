@@ -23,19 +23,17 @@ A função ajusta o YoY para os meses restantes do ano, levando em conta os dado
 }
 \details{
 O @param df de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 
 O @param target_aop indica o valor para média de período desejado, idealmete advindo de uma projeção anual.
 Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
 target_aop = c(15,12). Caso a quantidade de valores seja menor que o número de anos a ser projetado, repete-se o último valor.
 }
 \examples{
-\dontrun{
 sf_aop(df, end_forecast = '2026-12-01',
        target_aop = c(11.5,10.5,10.1,9.8,9.5)
        )
-}
 
 }
 \author{

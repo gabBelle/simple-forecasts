@@ -20,13 +20,11 @@ Aplica o método naive para realizar projeção. Cada valor previsto é igual ao
 }
 \details{
 O @param df de entrada deve conter, pelo menos, as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 }
 \examples{
-\dontrun{
 sf_naive(df = df_cleaned, end_forecast = '2026-12-01')
-}
 
 }
 \author{

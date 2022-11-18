@@ -9,7 +9,7 @@ get_target_from_yoy(df, yoy, end_forecast)
 \arguments{
 \item{df}{Dataframe contendo a série limpa e organizada;}
 
-\item{yoy}{Vetor numérico contendo a variação YoY em % (1% = 1)}
+\item{yoy}{Vetor numérico contendo a variação YoY em \% (1\% = 1)}
 
 \item{end_projection}{Data contendo o último mês a ser projetado.}
 }
@@ -23,15 +23,13 @@ que respeite o dado de YoY passado como argumento.
 }
 \details{
 O @param df de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 }
 \examples{
-\dontrun{
 get_target_from_yoy(df = df_cleaned,
                     yoy = (10,12,12,15)
                     end_projection = '2026-12-01')
-}
 
 }
 \author{

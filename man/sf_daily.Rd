@@ -12,7 +12,7 @@ sf_daily(target, ...)
 \item{...}{Dataframe, N dfs que serão projetados utilizando a projeção contida em target}
 }
 \value{
-Retorna um dataframe com colunas de \code{date}, \code{forecast} e uma
+Retorna um dataframe com colunas de {date}, {forecast} e uma
 coluna de valor para cada série que foi projetada, na mesma ordem em que foi inputada na função.
 }
 \description{
@@ -23,8 +23,8 @@ A projeção da série diária considera apenas os dias úteis, seguindo calend�
 }
 \details{
 O @param target de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 }
 \examples{
 \dontrun{

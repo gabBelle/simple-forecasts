@@ -7,29 +7,27 @@
 load_clean_series(sids, auth_path, estimate = NULL)
 }
 \arguments{
-\item{sids}{Vetor do tipo \code{chr} contendo as séries a serem retornadas da FS;}
+\item{sids}{Vetor do tipo {chr} contendo as séries a serem retornadas da FS;}
 
 \item{auth_path}{Chr contendo o caminho para o arquivo de autenticação do series.4macro}
 }
 \value{
 O retorno é um df contendo as colunas:
-\code{sid}: SeriesID da série;
-\code{date}: Data da observação:
-\code{forecast}: TRUE quando a observação for uma projeção;
-\code{vl}: valor da observação.
+{sid}: SeriesID da série;
+{date}: Data da observação:
+{forecast}: TRUE quando a observação for uma projeção;
+{vl}: valor da observação.
 }
 \description{
 Carrega e limpas as séries da FS
 }
 \details{
 Baixa as séries da FS utilizados o pacote series.4macro e limpa elas
-para que fiquem no formato de \code{tibble}, empiladas e indicando onde é a projeção.
+para que fiquem no formato de {tibble}, empiladas e indicando onde é a projeção.
 }
 \examples{
-\dontrun{
 load_clean_series(sids = c('BREMP0018000OOML', 'BREMP0018000SOML'),
                   auth_path = 'User/auth.ini')
-}
 
 }
 \author{

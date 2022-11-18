@@ -18,13 +18,11 @@ do STL.
 }
 \details{
 O input deve ser um df contendo pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 get_stl(df = cleaned_df)
-}
 
 }
 \author{

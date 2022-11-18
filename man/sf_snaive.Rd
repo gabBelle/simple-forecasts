@@ -22,14 +22,12 @@ Método Seasonal Naïve, no qual cada previsão é igual ao último valor observ
 }
 \details{
 O @param df de entrada deve conter, pelo menos, as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 sf_snaive(df, nyears = 1, end_forecast = "2026-12-01")
 
-}
 
 }
 \author{

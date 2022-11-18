@@ -22,16 +22,14 @@ Realiza a projeção de um par de câmbio AB, se disponível a projeção dos pa
 }
 \details{
 Todos parâmetros de entrada devem conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
+{date}: Data da observação:
+{vl}: valor da observação;
 
 Caso algum parâmetro tenha tanto dado realizado quanto projetado, deve ser acompanhado de uma coluna
-\code{forecast}: bool contendo se o valor é projetado
+{forecast}: bool contendo se o valor é projetado
 }
 \examples{
-\dontrun{
 sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur)
-}
 
 }
 \author{

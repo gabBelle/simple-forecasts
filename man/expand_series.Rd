@@ -21,14 +21,12 @@ para ser preenchida por uma função de forecast.
 }
 \details{
 O input deve ser um df contendo pelo as colunas:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
 expand_series(df = df_series,
               end_forecast = '2026-12-01')
-}
 
 }
 \author{

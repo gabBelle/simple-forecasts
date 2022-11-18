@@ -13,7 +13,7 @@ drift_hist(df_forecast, nyears = NULL)
 }
 \value{
 O retorno é um df, contendo as colunas de:
-\code{date}; \code{vl}; \code{drift} e \code{forecast}.
+{date}; {vl}; {drift} e {forecast}.
 As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 }
 \description{
@@ -22,18 +22,16 @@ Para calcular a tendência, utiliza a tendência linear presente no histórico d
 }
 \details{
 O @param df_forecast de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
-\code{forecast}: bool indicando se a observação é uma projeção.
+{date}: Data da observação:
+{vl}: valor da observação;
+{forecast}: bool indicando se a observação é uma projeção.
 
 O @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 Se nenhum valor fornecido, utilizará o histórico completo.
 }
 \examples{
-\dontrun{
 drift_hist(df_forecast = cleaned_df,
            nyears = 5)
-}
 
 }
 \author{

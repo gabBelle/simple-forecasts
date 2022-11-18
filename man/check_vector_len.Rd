@@ -21,15 +21,13 @@ para fazer projeção utilizando o método drift.
 }
 \details{
 O @param df_forecast de entrada deve conter pelo as colunas de:
-\code{date}: Data da observação:
-\code{vl}: valor da observação;
-\code{forecast}: bool indicando se o valor na data é projetado.
+{date}: Data da observação:
+{vl}: valor da observação;
+{forecast}: bool indicando se o valor na data é projetado.
 }
 \examples{
-\dontrun{
 check_vector_len(df_forecast = df_forecast,
                   vector_to_check = target_value)
-}
 
 }
 \author{

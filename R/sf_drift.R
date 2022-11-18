@@ -11,12 +11,11 @@
 #'
 #' @param df_forecast Dataframe contendo a série já projetada, a ser adicionada tendência;
 #' @param nyears Opcional, constante numérica. X anos do histórico.
-#' @param manual_drift Opcional, vetor de valores numéricos indicando drift em % MoM;
+#' @param manual_drift Opcional, vetor de valores numéricos indicando drift em \% MoM;
 #' @param target_value Opcional, vetor de valores indicando a projeção desejada para final de período.
 #' @param trend_type Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.
 #'
 #' @details
-#'
 #' Deve-se preencher apenas uma opção entre @param nyear, @param manual_drift e @param target_value
 #' As restantes devem ser mantidas como NULL.
 #'
@@ -32,10 +31,10 @@
 #' indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
 #' a quantidade de anos a ser projetada, repetirá-se o último valor colocado.
 #' Ex: manual_drift = c(0.1, 0.1, 0.15, 0.2).
-#' Assim, será utilizado 0.1% nos dois primeiros anos, 0.15% no terceiro, 0.2% no quarto e nos anos seguintes,
+#' Assim, será utilizado 0.1\% nos dois primeiros anos, 0.15% no terceiro, 0.2\% no quarto e nos anos seguintes,
 #' até o fim do horizonte da projeção.
 #'
-#' Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma % do valor em t + valor em t.
+#' Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma \% do valor em t + valor em t.
 #'
 #' @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:

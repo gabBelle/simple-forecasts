@@ -7,7 +7,7 @@
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada;
-#' @param yoy Vetor numérico contendo a variação YoY em % (1% = 1)
+#' @param yoy Vetor numérico contendo a variação YoY em \% (1\% = 1)
 #' @param end_projection Data contendo o último mês a ser projetado.
 #'
 #' @details

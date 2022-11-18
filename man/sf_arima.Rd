@@ -19,15 +19,11 @@ Aplicação do método Auto.Arima para projeção
 }
 \details{
 O input deve ser um data.frame organizado:
-\code{date}: Data da observação:
-\code{vl}: valor da observação.
+{date}: Data da observação:
+{vl}: valor da observação.
 }
 \examples{
-\dontrun{
-
 sf_arima(df, end_forecast = "2026-12-01")
-
-}
 
 }
 \author{
