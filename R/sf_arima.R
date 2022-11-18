@@ -1,5 +1,5 @@
 #' @title Auto.Arima Default
-#' @name arimaUnivariate
+#' @name sf_arima
 #'
 #' @description Aplicação do método Auto.Arima para projeção
 #'
@@ -17,15 +17,15 @@
 #' @examples
 #' \dontrun{
 #'
-#' arimaUnivariate(df, end_forecast = "2026-12-01")
+#' sf_arima(df, end_forecast = "2026-12-01")
 #'
 #' }
 #'
 #' @export
 
-arimaUnivariate <- function(df, end_forecast){
+sf_arima <- function(df, end_forecast){
 
-    if(!all(c('date', 'vl') %in% colnames(df))) {
+    if(!all(c('date', 'vl') %in% base::colnames(df))) {
       stop("Há coluna com nome errado/faltante no df fornecido de input!")
 
   }
@@ -45,12 +45,12 @@ arimaUnivariate <- function(df, end_forecast){
 
 # Guardando as projeções
 
-    projection_arima <- data.frame(arima_projection) %>%
+    projection_arima <- base::data.frame(arima_projection) %>%
                         dplyr::select(date,.mean) %>%
                         dplyr::rename(vl = .mean) %>%
-                        dplyr::bind_rows(select(df, date, vl)) %>%
+                        dplyr::bind_rows(dplyr::select(df, date, vl)) %>%
                         dplyr::arrange(-desc(date)) %>%
-                        dplyr::full_join(select(serie, date, forecast), by = "date")
+                        dplyr::full_join(dplyr::select(serie, date, forecast), by = "date")
 
     return(projection_arima)
 

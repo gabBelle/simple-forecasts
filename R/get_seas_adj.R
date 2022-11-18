@@ -25,7 +25,7 @@
 
 get_seas_adj <- function(df, type = 'mean') {
 
-  if(!all(c('date', 'vl') %in% colnames(df))) {
+  if(!all(c('date', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
@@ -51,7 +51,7 @@ get_seas_adj <- function(df, type = 'mean') {
     df_dessaz <- df_dessaz %>%
       dplyr::mutate(vl = purrr::pmap(.l = Filter(is.numeric, .),
                                      .f = purrr::lift_vd(..f = mean)),
-                    vl = as.numeric(vl)
+                    vl = base::as.numeric(vl)
                     ) %>%
       dplyr::select(date, vl)
 
@@ -60,6 +60,6 @@ get_seas_adj <- function(df, type = 'mean') {
     }
   }
 
-  return(data.frame(df_dessaz))
+  return(base::data.frame(df_dessaz))
 
 }

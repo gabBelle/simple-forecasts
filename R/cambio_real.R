@@ -30,38 +30,38 @@
 
 cambio_real <- function(df, df_ipc_dom, df_ipc_int, mes_base) {
 
-  mes_base = as.Date(mes_base)
+  mes_base = base::as.Date(mes_base)
 
   real <- df %>%
-    rename(cambio = vl) %>%
-    mutate(var_cambio = cambio/lag(cambio)) %>%
-    select(-forecast) %>%
-    full_join(df_ipc_dom %>%
-                mutate(vl = vl/lag(vl)) %>%
-                rename(ipc_dom = vl) %>%
-                select(-forecast)) %>%
-    full_join(df_ipc_int %>%
-                mutate(vl = vl/lag(vl)) %>%
-                rename(ipc_int = vl) %>%
-                select(-forecast)) %>%
-    na.omit()
+    dplyr::rename(cambio = vl) %>%
+    dplyr::mutate(var_cambio = cambio/dplyr::lag(cambio)) %>%
+    dplyr::select(-forecast) %>%
+    dplyr::full_join(df_ipc_dom %>%
+                       dplyr::mutate(vl = vl/dplyr::lag(vl)) %>%
+                       dplyr::rename(ipc_dom = vl) %>%
+                       dplyr::select(-forecast)) %>%
+    dplyr::full_join(df_ipc_int %>%
+                       dplyr::mutate(vl = vl/dplyr::lag(vl)) %>%
+                       dplyr::rename(ipc_int = vl) %>%
+                       dplyr::select(-forecast)) %>%
+    stats::na.omit()
 
   cambio_base <- real[real$date == mes_base,]$cambio
 
-  forecast_dt <- min(min(filter(df, forecast)$date),
-                     min(filter(df_ipc_dom, forecast)$date),
-                     min(filter(df_ipc_int, forecast)$date))
+  forecast_dt <- base::min(min(filter(df, forecast)$date),
+                           base::min(filter(df_ipc_dom, forecast)$date),
+                           base::min(filter(df_ipc_int, forecast)$date))
   result <- real %>%
-    mutate(acum_cambio = cumprod(var_cambio),
-           acum_ipc_dom = cumprod(ipc_dom),
-           acum_ipc_int = cumprod(ipc_int)) %>%
-    mutate(cambio_real = case_when(
+    dplyr::mutate(acum_cambio = base::cumprod(var_cambio),
+           acum_ipc_dom = base::cumprod(ipc_dom),
+           acum_ipc_int = base::cumprod(ipc_int)) %>%
+    dplyr::mutate(cambio_real = dplyr::case_when(
       date == mes_base ~ cambio_base,
       date > mes_base ~ cambio_base * acum_cambio * (acum_ipc_int/acum_ipc_dom),
       date < mes_base ~ cambio_base / (acum_cambio * (acum_ipc_int/acum_ipc_dom)))) %>%
-    select(date, cambio_real) %>%
-    rename(vl = cambio_real) %>%
-    mutate(forecast = date >= forecast_dt)
+    dplyr::select(date, cambio_real) %>%
+    dplyr::rename(vl = cambio_real) %>%
+    dplyr::mutate(forecast = date >= forecast_dt)
 
   return(result)
 }

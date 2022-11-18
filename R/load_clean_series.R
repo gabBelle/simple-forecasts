@@ -27,10 +27,10 @@
 
 load_clean_series <- function(sids, auth_path, estimate = NULL) {
 
-  if(is.null(estimate)) {
-    query_data <- data.frame(sid = sids, force = T)
+  if(base::is.null(estimate)) {
+    query_data <- base::data.frame(sid = sids, force = T)
   } else {
-    query_data <- data.frame(sid = sids, force = T, estimate = estimate)
+    query_data <- base::data.frame(sid = sids, force = T, estimate = estimate)
   }
 
   series_fs <- series.4macro::get_multi_series(query_data,
@@ -43,10 +43,10 @@ load_clean_series <- function(sids, auth_path, estimate = NULL) {
     tidyr::unnest(contents) %>%
     dplyr::mutate(
       dt = dt %>%
-        as.Date(),
-      vl = as.numeric(vl),
-      sid = as.character(sid),
-      forecast = ifelse(lbl == '', F, T)) %>%
+        base::as.Date(),
+      vl = base::as.numeric(vl),
+      sid = base::as.character(sid),
+      forecast = base::ifelse(lbl == '', F, T)) %>%
     dplyr::arrange(sid, dt) %>%
     dplyr::rename(date = dt) %>%
     dplyr::select(-lbl) %>%

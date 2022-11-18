@@ -38,7 +38,7 @@
 #'           end_forecast = '2026-12-01',
 #'           nyears = 5,
 #'           target_value = c(180, 190, 195, 200),
-#'           trend_type = 'linear') {
+#'           trend_type = 'linear')
 #' }
 #'
 #' @export
@@ -53,31 +53,31 @@ sf_target <- function(df,
   df_seas_adj <- get_seas_adj(df, type = 'STL')
 
   #Pega o fator sazonal histórico
-  df_hist_seas_ratio <- seas_ratio(df_original = df,
-                                   df_dessaz = df_seas_adj,
-                                   nyears = nyears)
+  df_hist_seas_ratio <- sf_seas_ratio(df_original = df,
+                                      df_dessaz = df_seas_adj,
+                                      nyears = nyears)
 
   last_month_ratio_mean <- df_hist_seas_ratio %>%
-    filter(month == max(month)) %>%
-    pluck('ratio_mean')
+    dplyr::filter(month == base::max(month)) %>%
+    purrr::pluck('ratio_mean')
 
   #Transforma o target_value em valore dessaz usando o fator sazonal historico
   target_vl_dessaz = target_value / last_month_ratio_mean
 
   #Faz projeção naive do dessaz
-  df_naive <- naive(df = df_seas_adj,
+  df_naive <- sf_naive(df = df_seas_adj,
                     end_forecast = end_forecast)
 
   #Adiciona a tendência na projeção naive da série dessaz
-  df_drift <- drift(df_forecast = df_naive,
-                    target_value = target_vl_dessaz,
-                    trend_type = trend_type)
+  df_drift <- sf_drift(df_forecast = df_naive,
+                       target_value = target_vl_dessaz,
+                       trend_type = trend_type)
 
   #Converte a projeção com tendência dessaz para a série original
   #Mantendo a sazonalidade de acordo com o fator dessaz histórico
-  df_seas_ratio <- seas_ratio(df_original = df,
-                              df_dessaz = df_drift,
-                              nyears = nyears)
+  df_seas_ratio <- sf_seas_ratio(df_original = df,
+                                 df_dessaz = df_drift,
+                                 nyears = nyears)
   return(df_seas_ratio)
 
   }

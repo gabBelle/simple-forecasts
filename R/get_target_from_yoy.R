@@ -1,11 +1,13 @@
-#' @title Naive forecast
-#' @name naive
+#' @title Get target from YoY
+#' @name get_target_from_yoy
 #'
-#' @description Aplica o método naive para realizar projeção, cada valor previsto é igual ao último observado.
+#' @description Calcula um valor alvo, na mesma unidade de medida da série de input,
+#' que respeite o dado de YoY passado como argumento.
 #'
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada;
+#' @param yoy Vetor numérico contendo a variação YoY em % (1% = 1)
 #' @param end_projection Data contendo o último mês a ser projetado.
 #'
 #' @details
@@ -18,8 +20,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' naive(df = df_cleaned,
-#'       end_projection = '2026-12-01')
+#' get_target_from_yoy(df = df_cleaned,
+#'                     yoy = (10,12,12,15)
+#'                     end_projection = '2026-12-01')
 #' }
 #'
 #' @export
@@ -30,23 +33,23 @@ get_target_from_yoy <- function(df,
 
   last_vl <- df %>%
     dplyr::mutate(
-      month = format(date, '%m') %>%
-        as.numeric(),
-      year = format(date, '%Y') %>%
-        as.numeric()
+      month = base::format(date, '%m') %>%
+        base::as.numeric(),
+      year = base::format(date, '%Y') %>%
+        base::as.numeric()
     ) %>%
-    dplyr::filter(month == max(month)) %>%
-    dplyr::filter(year == max(year)) %>%
-    pluck('vl')
+    dplyr::filter(month == base::max(month)) %>%
+    dplyr::filter(year == base::max(year)) %>%
+    purrr::pluck('vl')
 
-  df_forecast <- naive(df, end_forecast = end_forecast)
+  df_forecast <- sf_naive(df, end_forecast = end_forecast)
 
   yoy_adj <- check_vector_len(df_forecast, yoy)
 
   target <- c(last_vl, yoy_adj/100 + 1) %>%
-    cumprod()
+    base::cumprod()
 
-  target <- target[2:length(target)]
+  target <- target[2:base::length(target)]
 
   return(target)
 }

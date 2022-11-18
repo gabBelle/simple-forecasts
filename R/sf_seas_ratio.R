@@ -30,7 +30,7 @@
 
 sf_seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
 
-  if(!all(c('date', 'vl') %in% colnames(df_original))) {
+  if(!all(c('date', 'vl') %in% base::colnames(df_original))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
@@ -39,17 +39,17 @@ sf_seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
     dplyr::right_join(df_dessaz %>%
                  dplyr::rename(dessaz = vl)) %>%
     dplyr::mutate(
-      forecast = ifelse(is.na(original), T, F),
+      forecast = base::ifelse(base::is.na(original), T, F),
       ratio = original / dessaz)
 
   if (is.null(nyears)) {
     date_filt = df_ratio %>%
       dplyr::filter(!forecast) %>%
       dplyr::mutate(
-        year = format(date, '%Y') %>%
-          as.numeric(),
-        month = format(date, '%m') %>%
-          as.numeric()
+        year = base::format(date, '%Y') %>%
+          base::as.numeric(),
+        month = base::format(date, '%m') %>%
+          base::as.numeric()
       )
 
     month_last_date <- date_filt %>%
@@ -67,28 +67,28 @@ sf_seas_ratio <- function(df_original, df_dessaz, nyears = NULL) {
   } else {
     hist_mean <- df_ratio %>%
       filter(!forecast) %>%
-      dplyr::filter(date >= max(date)- years(nyears))
+      dplyr::filter(date >= base::max(date)- lubridate::years(nyears))
   }
 
   hist_mean <- hist_mean %>%
-    dplyr::group_by(month = format(date, '%m'),
-                    month = as.numeric(month)) %>%
-    dplyr::summarise(ratio_mean = mean(ratio, na.rm = T)) %>%
+    dplyr::group_by(month = base::format(date, '%m'),
+                    month = base::as.numeric(month)) %>%
+    dplyr::summarise(ratio_mean = base::mean(ratio, na.rm = T)) %>%
     dplyr::ungroup()
 
-  if(max(df_dessaz$date) <= max(df_original$date)) {
+  if(base::max(df_dessaz$date) <= base::max(df_original$date)) {
     warning('Como não há projeção no df_dessaz em relação ao df_original, o retorno é a média histórica do fator sazonal.')
 
     output <- hist_mean
   } else {
     output <- df_ratio %>%
-      dplyr::mutate(month = format(date, '%m'),
-                    month = as.numeric(month)) %>%
+      dplyr::mutate(month = base::format(date, '%m'),
+                    month = base::as.numeric(month)) %>%
       dplyr::left_join(hist_mean) %>%
       dplyr::mutate(
-        original = ifelse(forecast,
-                          dessaz * ratio_mean,
-                          original)
+        original = base::ifelse(forecast,
+                                dessaz * ratio_mean,
+                                original)
       ) %>%
       dplyr::rename(vl = original) %>%
       dplyr::select(date, vl, forecast)

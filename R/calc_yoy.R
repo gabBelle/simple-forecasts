@@ -24,7 +24,7 @@
 #' @examples
 #' \dontrun{
 #' calc_yoy <- function(df,
-#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5)) {
+#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5))
 #' }
 #'
 #' @export
@@ -33,8 +33,8 @@ calc_yoy <- function(df, target_aop) {
 
   df <- df %>%
     dplyr::filter(!forecast) %>%
-    dplyr::mutate(year = format(date, '%Y') %>% as.numeric(),
-                  month = format(date, '%m') %>% as.numeric())
+    dplyr::mutate(year = base::format(date, '%Y') %>% base::as.numeric(),
+                  month = base::format(date, '%m') %>% base::as.numeric())
 
   last_finished_year <- df %>%
     dplyr::filter(month == max(month)) %>%
@@ -48,8 +48,8 @@ calc_yoy <- function(df, target_aop) {
     purrr::pluck('mean')
 
   target_yoy <- c(mean_last_year, target_aop)
-  target_yoy <- target_yoy/lag(target_yoy,1) - 1
-  target_yoy <- target_yoy[2:length(target_yoy)]
+  target_yoy <- target_yoy/dplyr::lag(target_yoy,1) - 1
+  target_yoy <- target_yoy[2:base::length(target_yoy)]
 
   return(target_yoy)
 }

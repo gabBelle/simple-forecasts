@@ -25,7 +25,7 @@
 get_periodicity <- function(df) {
 
   periodicity = df %>%
-    dplyr::group_by(year = format(date, '%Y')) %>%
+    dplyr::group_by(year = base::format(date, '%Y')) %>%
     dplyr::summarise(count = dplyr::n_distinct(date)) %>%
     dplyr::ungroup()
 
@@ -39,7 +39,7 @@ get_periodicity <- function(df) {
     p_ngap = 3
   }
 
-  output <- list(
+  output <- base::list(
     p_name = p_name,
     p_nmonths = p_nmonths,
     p_ngap = p_ngap

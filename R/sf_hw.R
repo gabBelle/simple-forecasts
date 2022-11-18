@@ -1,5 +1,5 @@
 #' @title Holt-Winters
-#' @name holtWinter
+#' @name sf_hw
 #'
 #' @description Aplicação do método Holt-Winters para projeção
 #'
@@ -18,16 +18,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' holtWinter(df, type = NULL, end_forecast = "2026-12-01")
+#' sf_hw(df, type = NULL, end_forecast = "2026-12-01")
 #'
 #' }
 #'
 #' @export
 
 
-holtWinter <- function(df, type = NULL, end_forecast){
+sf_hw <- function(df, type = NULL, end_forecast){
 
-    if(!all(c('date', 'vl') %in% colnames(df))) {
+    if(!all(c('date', 'vl') %in% base::colnames(df))) {
       stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
@@ -40,7 +40,7 @@ holtWinter <- function(df, type = NULL, end_forecast){
 
 # Filtrangem entre sazonalidade aditiva-multiplicativa e tendência
 
-    if(is.null(type)){
+    if(base::is.null(type)){
 
     hw_model <- hw_base %>% fabletools::model(fable::ETS(vl))
 
@@ -64,14 +64,14 @@ holtWinter <- function(df, type = NULL, end_forecast){
                     fabletools::forecast(h = (zoo::as.yearmon(max(serie$date))- zoo::as.yearmon(max(df$date)))*get_periodicity(df)$p_nmonths)
 
 
-    result_projection <- data.frame(hw_projection) %>%
+    result_projection <- base::data.frame(hw_projection) %>%
                          dplyr::select(date,.mean) %>%
                          dplyr::rename(vl = .mean) %>%
                          dplyr::bind_rows(select(df, date, vl)) %>%
                          dplyr::arrange(-desc(date)) %>%
                          dplyr::full_join(select(serie, date, forecast), by = "date")
 
-    return(data.frame(result_projection))
+    return(base::data.frame(result_projection))
 
 }
 

@@ -30,7 +30,7 @@
 #' @examples
 #' \dontrun{
 #' sf_topdown(target_agg = df_pmc_geral,
-#'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario) {
+#'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario)
 #' }
 #'
 #' @export
@@ -42,30 +42,30 @@ sf_topdown <- function(target_agg, ...) {
   periodicity <- get_periodicity(target_agg)
 
   df_yoy <- target_agg %>%
-    rename(target_vl = vl) %>%
-    mutate(yoy = target_vl / lag(target_vl, periodicity$p_nmonths) - 1) %>%
-    filter(date >= min(df_down$date)) %>%
-    left_join(df_down, by = 'date')
+    dplyr::rename(target_vl = vl) %>%
+    dplyr::mutate(yoy = target_vl / dplyr::lag(target_vl, periodicity$p_nmonths) - 1) %>%
+    dplyr::filter(date >= base::min(df_down$date)) %>%
+    dplyr::left_join(df_down, by = 'date')
 
-  df_yoy['forecast'] <- ifelse(
-    is.na(rowSums(df_yoy[5:ncol(df_yoy)])), T, F)
+  df_yoy['forecast'] <- base::ifelse(
+    base::is.na(base::rowSums(df_yoy[5:ncol(df_yoy)])), T, F)
 
   df_forecast <- df_yoy
 
-  for (dt in filter(df_forecast, forecast)$date) {
+  for (dt in dplyr::filter(df_forecast, forecast)$date) {
     forecast_vl <- df_forecast %>%
-      filter(date <= dt) %>%
-      mutate(across(c(5:ncol(df_forecast)), ~ifelse(is.na(.x),
-                                                    lag(.x, periodicity$p_nmonths)*(1+yoy),
-                                                    .x))) %>%
-      filter(date == dt)
+      dplyr::filter(date <= dt) %>%
+      dplyr::mutate(across(c(5:ncol(df_forecast)), ~base::ifelse(base::is.na(.x),
+                                                                 dplyr::lag(.x, periodicity$p_nmonths)*(1+yoy),
+                                                                 .x))) %>%
+      dplyr::filter(date == dt)
 
    df_forecast[df_forecast['date'] == dt,] <- forecast_vl
   }
 
   df_forecast <- df_forecast %>%
-    select(-yoy) %>%
-    relocate(forecast, .after = 'date')
+    dplyr::select(-yoy) %>%
+    dplyr::relocate(forecast, .after = 'date')
 
   return(df_forecast)
 }

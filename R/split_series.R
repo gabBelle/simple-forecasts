@@ -28,14 +28,14 @@
 
 split_series <- function(df, sid, type = 'ambos') {
 
-  if(!all(c('sid', 'date', 'forecast', 'vl') %in% colnames(df))) {
+  if(!all(c('sid', 'date', 'forecast', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
   df <- df %>%
     dplyr::filter(sid == sid)
 
-  if(nrow(df) == 0) {
+  if(base::nrow(df) == 0) {
     stop('O parâmetro sid fornecido não existe no df de input!')
   }
 

@@ -23,17 +23,17 @@
 
 get_x13 <- function(df) {
 
-  if(!all(c('date', 'vl') %in% colnames(df))) {
+  if(!all(c('date', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
   periodicity <- get_periodicity(df)
 
-  mo <- as.numeric(format(df$date[1], '%m'))
-  yr <- as.numeric(format(df$date[1], '%Y'))
+  mo <- base::as.numeric(base::format(df$date[1], '%m'))
+  yr <- base::as.numeric(base::format(df$date[1], '%Y'))
 
   df_x13 <- stats::ts(df[['vl']], start = c(yr, mo),
-                       freq = periodicity$p_nmonths) %>%
+                      freq = periodicity$p_nmonths) %>%
     seasonal::seas() %>%
     seasonal::final() %>%
     tibble::as_tibble() %>%
@@ -41,7 +41,7 @@ get_x13 <- function(df) {
     dplyr::rename(x13 = 1,
                   date = 2) %>%
     dplyr::relocate(date, .after = NULL) %>%
-    mutate(x13 = as.numeric(x13))
+    mutate(x13 = base::as.numeric(x13))
 
   return(df_x13)
 }

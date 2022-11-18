@@ -44,25 +44,23 @@ drift_target <- function(df_forecast,
                          target_value,
                          trend_type = NULL) {
 
-  if(!all(c('date', 'forecast', 'vl') %in% colnames(df_forecast))) {
+  if(!all(c('date', 'forecast', 'vl') %in% base::colnames(df_forecast))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
   }
 
 
-  if(is.null(trend_type)) {
+  if(base::is.null(trend_type)) {
     trend_type = 'linear'
   }
 
-  periodicity <- get_periodicity(filter(df_forecast,
-                                        !forecast)
-                                 )
+  periodicity <- get_periodicity(dplyr::filter(df_forecast, !forecast))
 
   df_forecast <- df_forecast %>%
     dplyr::mutate(
-      year = format(date, '%Y') %>%
-        as.numeric(),
-      month = format(date, '%m') %>%
-        as.numeric()
+      year = base::format(date, '%Y') %>%
+        base::as.numeric(),
+      month = base::format(date, '%m') %>%
+        base::as.numeric()
     )
 
   target_value_adj <- check_vector_len(df_forecast = df_forecast,
@@ -70,7 +68,7 @@ drift_target <- function(df_forecast,
 
   last_row_hist <- df_forecast %>%
     dplyr::filter(!forecast) %>%
-    tail(1)
+    utils::tail(1)
 
   last_vl_hist <- last_row_hist$vl
 
@@ -78,56 +76,55 @@ drift_target <- function(df_forecast,
 
   first_date_target <- df_forecast %>%
     dplyr::filter(forecast) %>%
-    dplyr::filter(year == min(year),
-           month == max(month)) %>%
+    dplyr::filter(year == base::min(year),
+                  month == base::max(month)) %>%
     purrr::pluck('date')
 
-  dist_hist_first_target <- length(
-    seq(last_hist_date,
-        first_date_target,
-        by = periodicity$p_name)
-  ) - 1
+  dist_hist_first_target <- base::length(
+    base::seq(last_hist_date,
+              first_date_target,
+              by = periodicity$p_name)) - 1
 
   depara_year_target <- df_forecast %>%
     dplyr::filter(forecast) %>%
     dplyr::group_by(year) %>%
-    dplyr::filter(date == max(date)) %>%
+    dplyr::filter(date == base::max(date)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(vl = target_value_adj)
 
   if(trend_type == 'linear') {
     drift_forecast <- depara_year_target %>%
       dplyr::mutate(
-        drift = (vl - lag(vl,1)) / periodicity$p_nmonths,
-        drift = ifelse(is.na(drift),
-                       (vl - last_vl_hist) / dist_hist_first_target,
-                       drift)
+        drift = (vl - dplyr::lag(vl,1)) / periodicity$p_nmonths,
+        drift = base::ifelse(base::is.na(drift),
+                             (vl - last_vl_hist) / dist_hist_first_target,
+                             drift)
       ) %>%
       dplyr::select(c(forecast, year, drift)) %>%
       dplyr::right_join(df_forecast) %>%
       dplyr::arrange(date) %>%
-      dplyr::mutate(drift = ifelse(forecast, drift, 0),
-             drift = cumsum(drift))
+      dplyr::mutate(drift = base::ifelse(forecast, drift, 0),
+                    drift = base::cumsum(drift))
 
     type_drift = 'add'
   } else if(trend_type == 'exponential') {
     drift_forecast <- depara_year_target %>%
       dplyr::mutate(
-        drift = (vl - lag(vl))/lag(vl),
+        drift = (vl - dplyr::lag(vl))/dplyr::lag(vl),
         drift = drift + 1,
         drift = drift ^ (1/periodicity$p_nmonths),
         first_year = (vl - last_vl_hist) / last_vl_hist,
         first_year = first_year + 1,
         first_year = first_year ^ (1/dist_hist_first_target),
-        drift = ifelse(is.na(drift),
-                       first_year,
-                       drift)
+        drift = base::ifelse(base::is.na(drift),
+                             first_year,
+                             drift)
       ) %>%
       dplyr::select(c(forecast, year, drift)) %>%
       dplyr::right_join(df_forecast) %>%
       dplyr::arrange(date) %>%
-      dplyr::mutate(drift = ifelse(forecast, drift, 1),
-             drift = cumprod(drift))
+      dplyr::mutate(drift = base::ifelse(forecast, drift, 1),
+                    drift = base::cumprod(drift))
 
     type_drift = 'mult'
   }
