@@ -1,6 +1,8 @@
 ---
 title: "Example Simple-forecasts"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r}

@@ -4,30 +4,29 @@
 \alias{load_clean_series}
 \title{Load and Clean Feature Store (FS) series}
 \usage{
-load_clean_series(sids, auth_path, estimate = NULL)
+load_clean_series(sid_vl, auth_path, estimate = NULL)
 }
 \arguments{
-\item{sids}{Vetor do tipo {chr} contendo as séries a serem retornadas da FS;}
+\item{sid_vl}{Vetor chr com um ou mais SeriesID;}
 
-\item{auth_path}{Chr contendo o caminho para o arquivo de autenticação do series.4macro}
+\item{auth_path}{Chr com caminho para o arquivo de autenticação do series.4macro;}
+
+\item{estimate}{bool indicando se deve baixar dado realizado ou projetado. Se NULL baixa ambas.}
 }
 \value{
-O retorno é um df contendo as colunas:
-{sid}: SeriesID da série;
-{date}: Data da observação:
-{forecast}: TRUE quando a observação for uma projeção;
-{vl}: valor da observação.
+O retorno é um df contendo as colunas: sid, date, forecast e vl.
 }
 \description{
-Carrega e limpas as séries da FS
+Carrega e limpas as séries da FS.
 }
 \details{
-Baixa as séries da FS utilizados o pacote series.4macro e limpa elas
-para que fiquem no formato de {tibble}, empiladas e indicando onde é a projeção.
+Baixa as séries da FS utilizando o pacote series.4macro e limpa elas
+para que fiquem no formato de {tibble}, empiladas e indicando qual valor é projeção.
 }
 \examples{
-load_clean_series(sids = c('BREMP0018000OOML', 'BREMP0018000SOML'),
-                  auth_path = 'User/auth.ini')
+load_clean_series(sid_vl = c('BREMP0018000OOML', 'BREMP0018000SOML'),
+                  auth_path = 'User/auth.ini'
+                  estimate = TRUE)
 
 }
 \author{
