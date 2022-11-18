@@ -2,22 +2,21 @@
 #' @name get_seas_adj
 #'
 #' @description Calcula o dessaz de uma série com as configurações automáticas
-#' do STL ou do X13, opcional retornar a média dos dois.
+#' do STL, do X13, ou da média entre eles.
 #'
 #' @param df Dataframe contendo a série a ser dessazonalizada;
-#' @param type Chr especificando tipo de dessaz a ser aplicado (STL, X13, mean).
-#'
-#' @author Gabriel Bellé
+#' @param type Chr (STL, X13, mean) tipo de dessaz a ser aplicado.
 #'
 #' @details
-#' O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação.
+#' Chama as funções do pacote, get_stl e get_x13, onde de fator é realizado a estimação.
+#' A função get_periodificity permite realizar o dessaz tanto de uma série mensal quanto de série trimestral, sem necessidade de especificação.
+#'
+#' @author Gabriel Bellé
 #'
 #' @return O retorno é um df contendo os valores da série dessazonalidada e a data.
 #'
 #' @examples
-#' get_seas_adj(df = cleaned_df, type = 'median')
+#' get_seas_adj(df = cleaned_df, type = 'mean')
 #'
 #' @export
 
