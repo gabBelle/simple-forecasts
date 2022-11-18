@@ -1,15 +1,16 @@
 # Pacote Simple-Forecasts
 ## Descrição
 
-Simple-Forecasts realiza projeções simples para séries de tempo.
+O pacote realiza projeções simples para séries de tempo.
 Incluí métodos de modelagem univariada, copiar outra projeção, funções auxiliares e integração com FS e FaaS (futuramente).
 
 ## Instalação
 
-Você pode instalar a versão de desenvolvimento do GitHub
+Para instalar o pacote, pode ser utilizado a função devtools::install_github(). Como este é um repositório privado, deve ser usado um token do GitHub. Para gerá-lo, acesse [aqui](https://github.com/settings/tokens), e seleciona a permissão repo (Full control of private repositories) em token classic. 
+
 ```sh
-# install.packages("remotes")
-remotes::install_github("")
+# install.packages("devtools")
+devtools::install_github("gabBelle/simple-forecasts", ref = "main", auth_token = "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")
 ```
 ## Funções
 
