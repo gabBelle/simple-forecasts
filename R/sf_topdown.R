@@ -14,13 +14,13 @@
 #'
 #' @details
 #' O @param target_agg deve conter as seguintes colunas:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
-#' \code{forecast}: bool indicando se o valor é projeção.
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
+#' {forecast}: bool indicando se o valor é projeção.
 #'
 #' Os dfs passados em @param ... devem conter as colunas:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação e;
+#' {date}: Data da observação:
+#' {vl}: valor da observação e;
 #'
 #' deve possuir mesma periodicidade que o @param target_agg.
 #'
@@ -28,10 +28,8 @@
 #' coluna de valor para cada série que foi projetada, na mesma ordem em que foi inputada na função.
 #'
 #' @examples
-#' \dontrun{
 #' sf_topdown(target_agg = df_pmc_geral,
 #'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario)
-#' }
 #'
 #' @export
 

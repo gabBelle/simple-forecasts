@@ -10,16 +10,14 @@
 #'
 #' @details
 #' O @param df de entrada deve conter, pelo menos, as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
 #'
 #' @return Retorna o mesmo df de input, porém com a projeção naïve,
 #' e com a coluna forecast indicando quais observações são projetadas.
 #'
 #' @examples
-#' \dontrun{
 #' sf_naive(df = df_cleaned, end_forecast = '2026-12-01')
-#' }
 #'
 #' @export
 

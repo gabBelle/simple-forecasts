@@ -10,19 +10,17 @@
 #' @author Gabriel Bellé
 #'
 #' @details O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
-#' \code{sid}: SériesID da série;
-#' \code{date}: Data da observação:
-#' \code{forecast}: TRUE quando a observação for uma projeção;
-#' \code{vl}: valor da observação.
+#' {sid}: SériesID da série;
+#' {date}: Data da observação:
+#' {forecast}: TRUE quando a observação for uma projeção;
+#' {vl}: valor da observação.
 #'
 #' @return O retorno é um df contendo os valores da série e a data.
 #'
 #' @examples
-#' \dontrun{
 #' split_fs_series(df = cleaned_df,
 #'                 sid = 'BREMP0018000OOML'),
 #'                 type = 'ambos')
-#' }
 #'
 #' @export
 

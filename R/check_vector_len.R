@@ -11,18 +11,16 @@
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
-#' \code{forecast}: bool indicando se o valor na data é projetado.
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
+#' {forecast}: bool indicando se o valor na data é projetado.
 #'
 #' @return O retorno é um vetor com o tamanho adequado em relação ao número de meses
 #' da projeção e o número de vezes que cada valor será repetido.
 #'
 #' @examples
-#' \dontrun{
 #' check_vector_len(df_forecast = df_forecast,
 #'                   vector_to_check = target_value)
-#' }
 #'
 #' @export
 

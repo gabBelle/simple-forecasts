@@ -7,18 +7,16 @@
 #' @author Gabriel Bellé
 #'
 #' @details O input deve ser um df contendo pelo menos as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return O retorno é uma lista contendo os parametros de:
-#' \code{p_name}: nome da periodicidade;
-#' \code{p_nmonths}: quantos meses há na periodicidade;
-#' \code{p_ngap}: quantos meses pular até a próxima observação.
+#' {p_name}: nome da periodicidade;
+#' {p_nmonths}: quantos meses há na periodicidade;
+#' {p_ngap}: quantos meses pular até a próxima observação.
 #'
 #' @examples
-#' \dontrun{
 #' get_periodicity(df = cleaned_df)
-#' }
 #'
 #' @export
 

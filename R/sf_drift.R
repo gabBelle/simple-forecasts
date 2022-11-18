@@ -21,9 +21,9 @@
 #' As restantes devem ser mantidas como NULL.
 #'
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
-#' \code{forecast}: bool indicando se a observação é uma projeção.
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
+#' {forecast}: bool indicando se a observação é uma projeção.
 #'
 #' @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear/exponencial.
 #' Se nenhum valor fornecido, utilizará o histórico completo.
@@ -50,7 +50,6 @@
 #' A coluna 'vl_old' é incluída e contém a projeção anterior à modificação.
 #'
 #' @examples
-#' \dontrun{
 #' sf_drift(df = cleaned_df,
 #'          nyears = 5)
 #'
@@ -60,8 +59,6 @@
 #' sf_drift(df = cleaned_df,
 #'          target_value = c(200, 230),
 #'          trend_type = 'linear')
-#' }
-#'
 #' @export
 
 sf_drift <- function(df_forecast,

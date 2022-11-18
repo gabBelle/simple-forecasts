@@ -12,19 +12,17 @@
 #'
 #' @details
 #' O @param df de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
 #'
 #' @return Retorna um dataframe contendo o câmbio real.
 #'
 #' @examples
-#' \dontrun{
 #' cambio_real(real_usd, #BRL/USD
 #'             ipca_br,
 #'             ipc_us,
 #'             '2022-01-01'
 #'             ))
-#' }
 #'
 #' @export
 

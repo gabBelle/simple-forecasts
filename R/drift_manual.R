@@ -11,9 +11,9 @@
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
-#' \code{forecast}: bool indicando se a observação é uma projeção.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
+#' {forecast}: bool indicando se a observação é uma projeção.
 #'
 #' O @param manual_drift deve conter um vetor numérico onde cada constante
 #' indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
@@ -25,14 +25,12 @@
 #' Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma % do valor em t + valor em t.
 #'
 #' @return O retorno é um df, contendo as colunas de:
-#' \code{date}; \code{vl}; \code{drift} e \code{forecast}.
+#' {date}; {vl}; {drift} e {forecast}.
 #' As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 #'
 #' @examples
-#' \dontrun{
 #' drift_manual(df_forecast = cleaned_df,
 #'              manual_drift = c(0.1, 0.15))
-#' }
 #'
 #' @export
 

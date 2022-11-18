@@ -9,15 +9,13 @@
 #' @author Gabriel Bellé
 #'
 #' @details O input deve ser um df contendo pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return O retorno é um df contendo os valores da série dessazonalizada e a data.
 #'
 #' @examples
-#' \dontrun{
 #' get_x13(df = cleaned_df)
-#' }
 #'
 #' @export
 

@@ -12,18 +12,16 @@
 #'
 #' @details
 #' O @param df de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
 #'
 #' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método naïve,
 #' e com a coluna forecast indicando quais observações são projeção.
 #'
 #' @examples
-#' \dontrun{
 #' get_target_from_yoy(df = df_cleaned,
 #'                     yoy = (10,12,12,15)
 #'                     end_projection = '2026-12-01')
-#' }
 #'
 #' @export
 

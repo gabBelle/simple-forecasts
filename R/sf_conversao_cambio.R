@@ -12,18 +12,16 @@
 #'
 #' @details
 #' Todos parâmetros de entrada devem conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
 #'
 #' Caso algum parâmetro tenha tanto dado realizado quanto projetado, deve ser acompanhado de uma coluna
-#' \code{forecast}: bool contendo se o valor é projetado
+#' {forecast}: bool contendo se o valor é projetado
 #'
 #' @return Retorna um Dataframe contendo a projeção da série @param df, no mesmo horizente que @param df_target
 #'
 #' @examples
-#' \dontrun{
 #' sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur)
-#' }
 #'
 #' @export
 

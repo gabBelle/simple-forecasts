@@ -10,17 +10,15 @@
 #' @author Gabriel Bellé
 #'
 #' @details O input deve ser um df contendo pelo as colunas:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return Retorna o mesmo df de input, mas com o período de datas aumentado de acordo com
 #' o fim da projeção fornecida.
 #'
 #' @examples
-#' \dontrun{
 #' expand_series(df = df_series,
 #'               end_forecast = '2026-12-01')
-#' }
 #'
 #' @export
 

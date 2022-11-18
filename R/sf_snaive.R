@@ -12,16 +12,14 @@
 #'
 #' @details
 #' O @param df de entrada deve conter, pelo menos, as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return Retorna o mesmo df de input, porém com a projeção Seasonal naïve.
 #'
 #' @examples
-#' \dontrun{
 #' sf_snaive(df, nyears = 1, end_forecast = "2026-12-01")
 #'
-#' }
 #'
 #' @export
 

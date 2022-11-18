@@ -9,17 +9,13 @@
 #' @author Luiz Paulo T.
 #'
 #' @details O input deve ser um data.frame organizado:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método Auto.Arima
 #'
 #' @examples
-#' \dontrun{
-#'
 #' sf_arima(df, end_forecast = "2026-12-01")
-#'
-#' }
 #'
 #' @export
 

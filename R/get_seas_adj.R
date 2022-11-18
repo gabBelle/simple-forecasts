@@ -11,15 +11,13 @@
 #'
 #' @details
 #' O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação.
+#' {date}: Data da observação:
+#' {vl}: valor da observação.
 #'
 #' @return O retorno é um df contendo os valores da série dessazonalidada e a data.
 #'
 #' @examples
-#' \dontrun{
 #' get_seas_adj(df = cleaned_df, type = 'median')
-#' }
 #'
 #' @export
 

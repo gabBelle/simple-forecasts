@@ -15,9 +15,9 @@
 #'
 #' @details
 #' O @param df_forecast de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
-#' \code{forecast}: bool indicando se a observação é uma projeção.
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
+#' {forecast}: bool indicando se a observação é uma projeção.
 #'
 #' O @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
@@ -29,15 +29,12 @@
 #' alvo em target_value. Aceita os valores (linear, exponencial).
 #'
 #' @return O retorno é um df, contendo as colunas de:
-#' \code{date}; \code{vl}; \code{drift} e \code{forecast}.
+#' {date}; {vl}; {drift} e {forecast}.
 #' As colunas são iguais ao input, com exceção da coluna drift, que possui o valor a ser adicionado na série.
 #'
 #' @examples
-#' \dontrun{
 #' drift_target(df_forecast = cleaned_df,
 #'              target_value = c(200, 230, 150, 210, 100))
-#' }
-#'
 #' @export
 
 drift_target <- function(df_forecast,

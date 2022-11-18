@@ -13,10 +13,10 @@
 #'
 #' @details
 #' O @param target de entrada deve conter pelo as colunas de:
-#' \code{date}: Data da observação:
-#' \code{vl}: valor da observação;
+#' {date}: Data da observação:
+#' {vl}: valor da observação;
 #'
-#' @return Retorna um dataframe com colunas de \code{date}, \code{forecast} e uma
+#' @return Retorna um dataframe com colunas de {date}, {forecast} e uma
 #' coluna de valor para cada série que foi projetada, na mesma ordem em que foi inputada na função.
 #'
 #' @examples
