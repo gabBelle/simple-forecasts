@@ -10,7 +10,7 @@ Para instalar o pacote, pode ser utilizado a função devtools::install_github()
 
 ```sh
 # install.packages("devtools")
-devtools::install_github("gabBelle/simple-forecasts", ref = "main", auth_token = "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")
+devtools::install_github("gabBelle/simple-forecasts", ref = "main", auth_token = "token_pessoal")
 ```
 ## Funções
 
