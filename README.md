@@ -1,28 +1,45 @@
-# Package simple-forecasts
-## _Description_
+# Pacote Simple-Forecasts
+## Descrição
 
+O pacote realiza projeções simples para séries de tempo.
+Incluí métodos de modelagem univariada, copiar outra projeção, funções auxiliares e integração com FS e FaaS (futuramente).
 
-O simple-forecasts busca ser um pacote ágil para projeções simples de série temporal. Assim, o package fornece funções como, por exemplo, Seasonal naïve, Holt-Winters, Auto-arima univariado, X-13 ARIMA-SEATS, Seasonal Decomposition of Time Series by Loess (STL).  
+## Instalação
 
+Para instalar o pacote, pode ser utilizado a função devtools::install_github(). Como este é um repositório privado, deve ser usado um token do GitHub. Para gerá-lo, acesse [aqui](https://github.com/settings/tokens), e seleciona a permissão repo (Full control of private repositories) em token classic. 
 
-## _Installation_
-
-Você pode instalar a versão de desenvolvimento do GitHub
 ```sh
-# install.packages("remotes")
-remotes::install_github("")
+# install.packages("devtools")
+devtools::install_github("gabBelle/simple-forecasts", ref = "main", auth_token = "token_pessoal")
 ```
-## _Functions_
+## Funções
 
-- **load_clean_series** carrega e limpa as séries da FS; 
-- **split_series** retorna, entre as séries importadas da FS, apenas uma das séries; 
-- **get_perodicity** retorna a periodicidade de um dataframe;
-- **expand_series** aumenta o vetor de datas de um dataframe, inputando NAs na coluna de observação, para ser preenchida por alguma função de forecast; 
-- **snaive** retorna o modelo Seasonal naïve; 
-- **holtWinter** retorna o modelo Holt-Winters; 
-- **arimaUnivariate** retorna o modelo Auto ARIMA; 
-- **get_seas_adj** retorna a dessazonalização de uma série com as configurações automáticas do STL ou do X13, opcional retornar a média ou a mediana entre os dois métodos. 
+##### Utils: 
+- **load_clean_series**: Carrega múltiplas séries do 4macro, limpando-as; 
+- **split_series**: Seleciona apenas uma série retornada pelo _load_clean_series_; 
+- **get_seas_adj**: Calcula a série ajustada sazonalmente, com parâmetros automáticos (STL ou X13 ou ambos);
+- **cambio_real**: Calcula o câmbio real a partir do câmbio nominal e de índices de inflação de ambos países. 
 
+##### Simples: 
+- **sf_naive**: Projeção Naive (repete último valor);
+- **sf_snaive**: Projeção Seasonal Naive (repete último valor sazonal); 
+- **sf_drift**: Projeção de tendência (Utiliza tendência passada, valor final ou MoM);
+- **sf_daily**: Projeção de tendência para séries diárias (valor final é a projeção da série mensal);
+- **sf_aop**: Projeção usando YoY médio anual (compatibiliza YoY para os meses restantes);
+- **sf_topdown**: Utiliza o mesmo YoY do mês projetado em outra série;
+- **sf_seas_ratio**: Projeta uma série utilizando sua projeção dessaz, por meio do fator sazonal. 
+- **sf_target**: Encapsula o  _drift_ e o _seas_ratio_  para projetar uma série original até seu valor final (ex.: provindo de uma projeção anual);
+- **sf_conversao_cambio**: Utiliza dois pares de câmbio para projetar um terceiro (há projeção de BRL/USD e USD/EUR, gera-se BRL/EUR)
+
+##### Univariado
+- **sf_hw**: Suavização Exponencial Holt-Winters; 
+- **sf_arima**: Auto-Arima.
+
+##### Auxiliares
+- **calc_yoy**: Calcula o YoY a partir de uma projeção;
+- **check_vector_len**: Checa se o tamanho da projeção é adequado ao horizonte desejado;
+- **expand_series**: aumenta o vetor de Date de um dataframe;
+- **get_perodicity**: calcula a periodicidade de um dataframe.
 
 ## _Dependencies_
 
