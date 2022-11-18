@@ -49,8 +49,7 @@ check_vector_len <- function(df_forecast,
 
     last_value <- utils::tail(vector_to_check, 1)
     vector_to_check <- vector_to_check[1:n_years]
-    vector_to_check <- base::(is.na(vector_to_check), last_value, vector_to_check)
-
+    vector_to_check <- base::ifelse(base::is.na(vector_to_check), last_value, vector_to_check)
   } else {
     vector_to_check <- vector_to_check
   }

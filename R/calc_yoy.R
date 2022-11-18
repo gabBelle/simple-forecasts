@@ -24,7 +24,7 @@
 #' @examples
 #' \dontrun{
 #' calc_yoy <- function(df,
-#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5)) {
+#'                      target_aop = c(11.5,10.5,10.1,9.8,9.5))
 #' }
 #'
 #' @export

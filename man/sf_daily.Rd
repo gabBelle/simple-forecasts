@@ -26,6 +26,13 @@ O @param target de entrada deve conter pelo as colunas de:
 \code{date}: Data da observação:
 \code{vl}: valor da observação;
 }
+\examples{
+\dontrun{
+sf_daily(target = cambio_real_mensal,
+         cambio_diario_venda, cambio_diario_compra)
+}
+
+}
 \author{
 Gabriel Bellé
 }

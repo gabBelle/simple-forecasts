@@ -28,6 +28,13 @@ O @param target_aop indica o valor para média de período desejado, idealmete a
 Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
 target_aop = c(0.15,0.12)
 }
+\examples{
+\dontrun{
+calc_yoy <- function(df,
+                     target_aop = c(11.5,10.5,10.1,9.8,9.5))
+}
+
+}
 \author{
 Gabriel Bellé
 }

@@ -38,7 +38,7 @@
 #'           end_forecast = '2026-12-01',
 #'           nyears = 5,
 #'           target_value = c(180, 190, 195, 200),
-#'           trend_type = 'linear') {
+#'           trend_type = 'linear')
 #' }
 #'
 #' @export

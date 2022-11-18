@@ -22,7 +22,7 @@
 #' @examples
 #' \dontrun{
 #' sf_daily(target = cambio_real_mensal,
-#'          cambio_diario_venda, cambio_diario_compra) {
+#'          cambio_diario_venda, cambio_diario_compra)
 #' }
 #'
 #' @export
@@ -98,7 +98,7 @@ sf_daily <- function(target, ...) {
     dplyr::mutate(drift = base::ifelse(!forecast, 0, drift),
            drift = base::cumsum(drift),
            value = base::ifelse(forecast, NA, value)) %>%
-    dplyr::fill(value, .direction = 'down') %>%
+    tidyr::fill(value, .direction = 'down') %>%
     dplyr::mutate(value = value + drift) %>%
     dplyr::select(-c(month, drift)) %>%
     tidyr::pivot_wider(names_from = name, values_from = value)

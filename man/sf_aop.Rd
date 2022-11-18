@@ -28,7 +28,7 @@ O @param df de entrada deve conter pelo as colunas de:
 
 O @param target_aop indica o valor para média de período desejado, idealmete advindo de uma projeção anual.
 Por exemplo, a projeção anual do LatamFocus aponta média de 15% para 2022 e 12% para 2023. Pode-se preencher:
-target_aop = c(0.15,0.12). Caso a quantidade de valores seja menor que o número de anos a ser projetado, repete-se o último valor.
+target_aop = c(15,12). Caso a quantidade de valores seja menor que o número de anos a ser projetado, repete-se o último valor.
 }
 \examples{
 \dontrun{

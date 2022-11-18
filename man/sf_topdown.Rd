@@ -34,6 +34,13 @@ Os dfs passados em @param ... devem conter as colunas:
 
 deve possuir mesma periodicidade que o @param target_agg.
 }
+\examples{
+\dontrun{
+sf_topdown(target_agg = df_pmc_geral,
+           pmc_construcao, pmc_eletrodomestico, pmc_vestuario)
+}
+
+}
 \author{
 Gabriel Bellé
 }

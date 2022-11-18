@@ -30,7 +30,7 @@
 #' @examples
 #' \dontrun{
 #' sf_topdown(target_agg = df_pmc_geral,
-#'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario) {
+#'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario)
 #' }
 #'
 #' @export

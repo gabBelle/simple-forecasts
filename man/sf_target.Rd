@@ -40,6 +40,16 @@ end_projection = '2025-12-01' e target_value = c(150, 200)
 
 Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 }
+\examples{
+\dontrun{
+sf_target(df,
+          end_forecast = '2026-12-01',
+          nyears = 5,
+          target_value = c(180, 190, 195, 200),
+          trend_type = 'linear')
+}
+
+}
 \author{
 Gabriel Bellé
 }

@@ -68,7 +68,7 @@ drift_target <- function(df_forecast,
 
   last_row_hist <- df_forecast %>%
     dplyr::filter(!forecast) %>%
-    base::tail(1)
+    utils::tail(1)
 
   last_vl_hist <- last_row_hist$vl
 

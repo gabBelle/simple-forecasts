@@ -81,7 +81,7 @@ drift_hist <- function(df_forecast,
 
   df_forecast <- df_forecast %>%
     dplyr::mutate(drift = base::ifelse(forecast, drift_vl, 0),
-           drift = base::cumsum(drift)) %>%
+                  drift = base::cumsum(drift)) %>%
     dplyr::select(c(date, vl, drift, forecast))
 
   return(df_forecast)
