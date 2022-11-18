@@ -18,11 +18,11 @@
 #' Caso algum parâmetro tenha tanto dado realizado quanto projetado, deve ser acompanhado de uma coluna
 #' \code{forecast}: bool contendo se o valor é projetado
 #'
-#' @return Retorna um Dataframe contendo a projeção da série @param df, no mesmo horizente que @param df_target .
+#' @return Retorna um Dataframe contendo a projeção da série @param df, no mesmo horizente que @param df_target
 #'
 #' @examples
 #' \dontrun{
-#' sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur) {
+#' sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur)
 #' }
 #'
 #' @export
@@ -32,10 +32,12 @@ sf_conversao_cambio <- function(df, df_target, df_ratio) {
   if('forecast' %in% colnames(df)) {
     df <- df %>%
       dplyr::filter(!forecast)
-  } if('forecast' %in% colnames(df_target)) {
+  }
+  if('forecast' %in% colnames(df_target)) {
     df_target <- df_target %>%
       dplyr::filter(forecast)
-  } if('forecast' %in% colnames(df_ratio) {
+  }
+  if('forecast' %in% colnames(df_ratio)) {
     df_ratio <- df_ratio %>%
       dplyr::filter(forecast)
   }
