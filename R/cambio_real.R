@@ -11,9 +11,7 @@
 #' @param mes_base Ano e mês base para o câmbio real.
 #'
 #' @details
-#' O @param df de entrada deve conter pelo as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação;
+#' Todos dataframes devem começar pelo menos 1 mês antes da data inserida em mes_base.
 #'
 #' @return Retorna um dataframe contendo o câmbio real.
 #'

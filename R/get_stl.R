@@ -1,16 +1,12 @@
-#' @title Seasonal Decomposition of Time Series by Loess (STL)
+#' @title Seasonal-Trend decomposition using LOESS (STL)
 #' @name get_stl
 #'
 #' @description Calcula o dessaz de uma série com as configurações automáticas
-#' do STL.
+#' do Seasonal-Trend decomposition using LOESS (STL).
 #'
 #' @param df representa a série para dessazonalização
 #'
 #' @author Gabriel Bellé
-#'
-#' @details O input deve ser um df contendo pelo as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação.
 #'
 #' @return O retorno é um df contendo os valores da série dessazonalidada e a data.
 #'

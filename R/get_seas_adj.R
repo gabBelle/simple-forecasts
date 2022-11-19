@@ -8,8 +8,8 @@
 #' @param type Chr (STL, X13, mean) tipo de dessaz a ser aplicado.
 #'
 #' @details
-#' Chama as funções do pacote, get_stl e get_x13, onde de fator é realizado a estimação.
-#' A função get_periodificity permite realizar o dessaz tanto de uma série mensal quanto de série trimestral, sem necessidade de especificação.
+#' Chama as funções do pacote, get_stl e get_x13, onde de fato são feitas as estimações.
+#' A função realiza dessaz tanto de série mensal quanto de série trimestral, sem necessidade de parâmetro extra.
 #'
 #' @author Gabriel Bellé
 #'
@@ -24,6 +24,11 @@ get_seas_adj <- function(df, type = 'mean') {
 
   if(!all(c('date', 'vl') %in% base::colnames(df))) {
     stop("Há coluna com nome errado/faltante no df fornecido de input!")
+  }
+
+  if('forecast' %in% base::colnames(df)) {
+    col_forecast <- df %>%
+      dplyr::select(c(date, forecast))
   }
 
   periodicity <- get_periodicity(df)
@@ -50,11 +55,16 @@ get_seas_adj <- function(df, type = 'mean') {
                                      .f = purrr::lift_vd(..f = mean)),
                     vl = base::as.numeric(vl)
                     ) %>%
-      dplyr::select(date, vl)
+      select(-c(x13, stl))
 
     } else {
       stop("ERRO: type selecionado incompatível")
     }
+  }
+
+  if('forecast' %in% base::colnames(df)) {
+    df_dessaz <- df_dessaz %>%
+      dplyr::left_join(col_forecast)
   }
 
   return(base::data.frame(df_dessaz))

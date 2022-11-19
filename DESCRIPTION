@@ -26,3 +26,5 @@ Imports:
     tidyr,
     tsibble,
     zoo
+Depends: 
+    lubridate

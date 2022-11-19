@@ -8,10 +8,6 @@
 #'
 #' @author Gabriel Bellé
 #'
-#' @details O input deve ser um df contendo pelo as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação.
-#'
 #' @return O retorno é um df contendo os valores da série dessazonalizada e a data.
 #'
 #' @examples

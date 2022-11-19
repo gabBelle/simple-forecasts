@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_stl.R
 \name{get_stl}
 \alias{get_stl}
-\title{Seasonal Decomposition of Time Series by Loess (STL)}
+\title{Seasonal-Trend decomposition using LOESS (STL)}
 \usage{
 get_stl(df)
 }
@@ -14,12 +14,7 @@ O retorno é um df contendo os valores da série dessazonalidada e a data.
 }
 \description{
 Calcula o dessaz de uma série com as configurações automáticas
-do STL.
-}
-\details{
-O input deve ser um df contendo pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação.
+do Seasonal-Trend decomposition using LOESS (STL).
 }
 \examples{
 get_stl(df = cleaned_df)

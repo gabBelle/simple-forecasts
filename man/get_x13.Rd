@@ -16,11 +16,6 @@ O retorno é um df contendo os valores da série dessazonalizada e a data.
 Calcula o dessaz de uma série com as configurações automáticas
 do X13.
 }
-\details{
-O input deve ser um df contendo pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação.
-}
 \examples{
 get_x13(df = cleaned_df)
 

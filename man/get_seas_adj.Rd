@@ -9,22 +9,21 @@ get_seas_adj(df, type = "mean")
 \arguments{
 \item{df}{Dataframe contendo a série a ser dessazonalizada;}
 
-\item{type}{Chr especificando tipo de dessaz a ser aplicado (STL, X13, mean).}
+\item{type}{Chr (STL, X13, mean) tipo de dessaz a ser aplicado.}
 }
 \value{
 O retorno é um df contendo os valores da série dessazonalidada e a data.
 }
 \description{
 Calcula o dessaz de uma série com as configurações automáticas
-do STL ou do X13, opcional retornar a média dos dois.
+do STL, do X13, ou da média entre eles.
 }
 \details{
-O input @param df deve ser um DataFrame contendo pelo menos as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação.
+Chama as funções do pacote, get_stl e get_x13, onde de fato são feitas as estimações.
+A função realiza dessaz tanto de série mensal quanto de série trimestral, sem necessidade de parâmetro extra.
 }
 \examples{
-get_seas_adj(df = cleaned_df, type = 'median')
+get_seas_adj(df = cleaned_df, type = 'mean')
 
 }
 \author{
