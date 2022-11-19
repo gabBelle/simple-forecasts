@@ -126,6 +126,9 @@ então provir de uma premissa (0.1% de crescimento mensal; YoY de 5%)
 
 ### sf\_naive
 
+Naive forecasting. Repete o último valor realizado até o fim da
+projeção.
+
 ``` r
 pib_naive <- pib_4i %>% 
   simpleforecasts::sf_naive(end_forecast = '2025-12-01')
@@ -136,7 +139,7 @@ pib_naive <- pib_4i %>%
 Segue a mesma ideia do *sf\_naive*, no entanto, ao invés de repetir o
 último valor, repete o valor médio do histórico para o mesmo mês.
 
-o parâmetro *nyears*, permite selecionar X anos do histórico para
+O parâmetro *nyears* permite selecionar X anos do histórico para
 calcular a média dos valores para o mês. Se vazio, utiliza a média do
 histórico.
 
@@ -148,8 +151,8 @@ pib_snaive <- pib_4i %>%
 ![](Example_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
-pib_snaive_3y <- pib_4i %>% 
-  simpleforecasts::sf_snaive(nyear = 3, end_forecast = '2025-12-01')
+pib_snaive_5y <- pib_4i %>% 
+  simpleforecasts::sf_snaive(nyear = 5, end_forecast = '2025-12-01')
 ```
 
 ![](Example_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->

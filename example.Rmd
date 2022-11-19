@@ -190,6 +190,8 @@ d) sf_conversao_cambio: projeta um par de câmbio a partir de outros dois.
 
 ### sf_naive
 
+Naive forecasting. Repete o último valor realizado até o fim da projeção.
+
 ```{r}
 pib_naive <- pib_4i %>% 
   simpleforecasts::sf_naive(end_forecast = '2025-12-01')
@@ -210,7 +212,7 @@ ggplot(pib_naive,
 
 Segue a mesma ideia do _sf_naive_, no entanto, ao invés de repetir o último valor, repete o valor médio do histórico para o mesmo mês. 
 
-o parâmetro _nyears_, permite selecionar X anos do histórico para calcular a média dos valores para o mês. Se vazio, utiliza a média do histórico.
+O parâmetro _nyears_ permite selecionar X anos do histórico para calcular a média dos valores para o mês. Se vazio, utiliza a média do histórico.
 
 ```{r}
 pib_snaive <- pib_4i %>% 
@@ -230,18 +232,18 @@ ggplot(pib_snaive,
 ```
 
 ```{r}
-pib_snaive_3y <- pib_4i %>% 
-  simpleforecasts::sf_snaive(nyear = 3, end_forecast = '2025-12-01')
+pib_snaive_5y <- pib_4i %>% 
+  simpleforecasts::sf_snaive(nyear = 5, end_forecast = '2025-12-01')
 ```
 
 ```{r, echo=FALSE}
-ggplot(pib_snaive_3y,
+ggplot(pib_snaive_5y,
        aes(x = date, y = vl)) +
   geom_line(size = 1) +
   annotate("rect",
-         xmin = max(filter(pib_snaive_3y,!forecast)$date),
-         xmax = max(pib_snaive_3y$date),
-         ymin = min(filter(pib_snaive_3y,!forecast)$vl),
+         xmin = max(filter(pib_snaive_5y,!forecast)$date),
+         xmax = max(pib_snaive_5y$date),
+         ymin = min(filter(pib_snaive_5y,!forecast)$vl),
          ymax = Inf,
          alpha = 0.2)
 ```
