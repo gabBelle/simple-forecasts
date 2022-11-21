@@ -43,4 +43,4 @@ devtools::install_github("gabBelle/simple-forecasts", ref = "main", auth_token =
 
 ## Exemplos
 
-Para exemplos, consulte o arquivo view_example.md. 
+Para exemplos, consulte o arquivo Example.md. 
