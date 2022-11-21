@@ -60,8 +60,9 @@ pib_dessaz <- simpleforecasts::get_seas_adj(
 ### cambio\_real
 
 Calcula a taxa de câmbio real, utilizando a inflação dos dois países
-participantes. Deve-se selecionar um ano-mês para corresponder à base do
-índice, e passá-lo no parâmetro mes\_base.
+participantes.  
+Deve-se selecionar um ano-mês para corresponder à base do índice, e
+passá-lo no parâmetro mes\_base.
 
 ``` r
 rs_usd_real <- simpleforecasts::cambio_real(
@@ -113,22 +114,24 @@ uma premissa (0.1% de crescimento mensal; YoY de 5%)
 
 ### sf\_naive
 
-Projeão Naive. Repete o último valor realizado até o fim da projeção.
+Projeão Naive.  
+Repete o último valor realizado até o fim da projeção.
 
 ``` r
 pib_naive <- pib_4i %>% 
   simpleforecasts::sf_naive(end_forecast = '2025-12-01')
 ```
 
-![](Example_files/figure-gfm/unnamed-chunk-13-1.png)<!-- --> \#\#\#
-sf\_snaive
+![](Example_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+### sf\_snaive
 
 Segue a mesma ideia do *sf\_naive*, no entanto, ao invés de repetir o
 último valor, repete o valor médio do histórico para o mesmo mês.
 
 O parâmetro *nyears* permite selecionar X anos do histórico para
 calcular a média dos valores para o mês. Se vazio, utiliza a média do
-histórico.
+histórico completo.
 
 ``` r
 pib_snaive <- pib_4i %>% 
@@ -142,8 +145,9 @@ pib_snaive_2y <- pib_4i %>%
   simpleforecasts::sf_snaive(nyear = 2, end_forecast = '2025-12-01')
 ```
 
-![](Example_files/figure-gfm/unnamed-chunk-17-1.png)<!-- --> \#\#\#
-sf\_drift
+![](Example_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+### sf\_drift
 
 A função *sf\_drift* funciona adicionando tendência em uma projeção
 pré-existente.  
@@ -191,8 +195,9 @@ pib_drift_manual <- simpleforecasts::sf_drift(
 
 #### sf\_drift: target
 
-Calcula tendência futura tal qual atinga o valor indicado para fim de
-ano. Nesta opção, é possível definir o tipo de tendência em trend\_type,
+Calcula tendência futura tal qual atinja o valor indicado para fim de
+ano.  
+Nesta opção, é possível definir o tipo de tendência em trend\_type,
 podendose ser ‘linear’ ou ‘exponential’.
 
 ``` r
@@ -207,7 +212,7 @@ pib_drift_target <- simpleforecasts::sf_drift(
 
 ### sf\_target
 
-Calcula tendência futura tal qual atinga o valor indicado para fim de
+Calcula tendência futura tal qual atinja o valor indicado para fim de
 ano. Chama a função *seas\_ratio* para adicionar sazonalidade na
 projeção.
 
@@ -258,8 +263,9 @@ pib_aop <- simpleforecasts::sf_aop(
 
 ### sf\_daily
 
-Realiza projeção de uma série diária, usandop método semelhante ao
-*sf\_drift* target. A projeção é uma tendência linear até o alvo.
+Realiza projeção de uma série diária, usando método semelhante ao
+*sf\_drift* target.  
+A projeção é uma tendência linear até o alvo.
 
 No entanto, o valor objetivo é o dado projetado em uma série mensal.
 
@@ -282,8 +288,9 @@ YoY do alvo.
 
 Devido ao método empregado, permite que aberturas que compõem um
 indicador estejam sempre compatibilizadas com o indicador geral;
-independente da forma que ele é composto. Note-se que as aberturas terão
-o mesmo comportamento que a abertura geral.
+independente da forma que ele é composto.  
+Note-se que as aberturas terão o mesmo comportamento que a abertura
+geral.
 
 ``` r
 pim_topdown <- simpleforecasts::sf_topdown(
@@ -293,8 +300,9 @@ pim_topdown <- simpleforecasts::sf_topdown(
 )
 ```
 
-![](Example_files/figure-gfm/unnamed-chunk-35-1.png)<!-- --> \#\#\#
-sf\_seas\_ratio
+![](Example_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+
+### sf\_seas\_ratio
 
 A função realiza a projeção para uma série com sazonalidade a partir de
 uma projeção já existente para a série dessaz.
@@ -349,6 +357,10 @@ seas_ratio_historico <- simpleforecasts::sf_seas_ratio(
 
 ### sf\_conversao\_cambio
 
+Realiza a projeção de um par de câmbio AB, utilizando a projeção dos
+pares AC e CB.  
+(Ex.: par a ser projetado: ARS/EUR, há projeção de ARS/USD e USD/EUR)
+
 ``` r
 cl_eur_sf <- simpleforecasts::sf_conversao_cambio(
   df = cl_eur_realizado,
@@ -366,7 +378,7 @@ plot_forecast(cl_eur_sf %>%
 
 ## Univariado
 
-Funções que realizam projeção a partir de uma estimação, usando os
+Funções que realizam projeção por meio de uma estimação, usando os
 valores históricos da própria série.
 
 ### sf\_hw

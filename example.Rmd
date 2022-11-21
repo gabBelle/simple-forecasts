@@ -95,7 +95,7 @@ ggplot(plot_dessaz, aes(x=date, y=value, color=name)) +
 
 ### cambio_real
 
-Calcula a taxa de câmbio real, utilizando a inflação dos dois países participantes.
+Calcula a taxa de câmbio real, utilizando a inflação dos dois países participantes.  
 Deve-se selecionar um ano-mês para corresponder à base do índice, e passá-lo no parâmetro mes_base.
 
 ```{r, include=FALSE}
@@ -180,9 +180,8 @@ O valor de parâmetro pode provir de uma projeção feita em periodicidade maior
   + sf_daily: projeta a série diária como interpolação linear, no qual o último valor é igual ao dado mensal (provindo de outra série);
   + sf_topdown: utiliza a mesma variação anual que outra série;
   + sf_seas_ratio: projeta a série original a partir de sua projeção dessaz;
-  + sf_conversao_cambio: projeta um par de câmbio a partir de outros dois pares.
-
-
+  + sf_conversao_cambio: projeta um par de câmbio a partir de outros dois pares.  
+  
 ```{r, include=FALSE}
 plot_forecast <- function(x) {
   out <- ggplot(x,
@@ -199,9 +198,10 @@ plot_forecast <- function(x) {
 }
 ```
 
+
 ### sf_naive
 
-Projeão Naive.
+Projeão Naive.  
 Repete o último valor realizado até o fim da projeção.
 
 ```{r}
@@ -212,11 +212,12 @@ pib_naive <- pib_4i %>%
 ```{r, echo=FALSE}
 plot_forecast(pib_naive)
 ```
+
 ### sf_snaive
 
 Segue a mesma ideia do _sf_naive_, no entanto, ao invés de repetir o último valor, repete o valor médio do histórico para o mesmo mês. 
 
-O parâmetro _nyears_ permite selecionar X anos do histórico para calcular a média dos valores para o mês. Se vazio, utiliza a média do histórico.
+O parâmetro _nyears_ permite selecionar X anos do histórico para calcular a média dos valores para o mês. Se vazio, utiliza a média do histórico completo.
 
 ```{r}
 pib_snaive <- pib_4i %>% 
@@ -235,6 +236,7 @@ pib_snaive_2y <- pib_4i %>%
 ```{r, echo=FALSE}
 plot_forecast(pib_snaive_2y)
 ```
+
 ### sf_drift 
 
 A função _sf_drift_ funciona adicionando tendência em uma projeção pré-existente.  
@@ -285,7 +287,7 @@ plot_forecast(pib_drift_manual)
 
 #### sf_drift: target
 
-Calcula tendência futura tal qual atinga o valor indicado para fim de ano.
+Calcula tendência futura tal qual atinja o valor indicado para fim de ano.  
 Nesta opção, é possível definir o tipo de tendência em trend_type, podendose ser 'linear' ou 'exponential'. 
 
 ```{r}
@@ -301,7 +303,7 @@ plot_forecast(pib_drift_target)
 
 ### sf_target
 
-Calcula tendência futura tal qual atinga o valor indicado para fim de ano. 
+Calcula tendência futura tal qual atinja o valor indicado para fim de ano. 
 Chama a função _seas_ratio_ para adicionar sazonalidade na projeção.
 
 Diferentemente da função _sf_drift_, ela não precisa receber um df já com projeção.
@@ -345,7 +347,7 @@ plot_forecast(pib_aop)
 
 ### sf_daily
 
-Realiza projeção de uma série diária, usandop método semelhante ao _sf_drift_ target.
+Realiza projeção de uma série diária, usando método semelhante ao _sf_drift_ target.  
 A projeção é uma tendência linear até o alvo.
 
 No entanto, o valor objetivo é o dado projetado em uma série mensal.
@@ -380,7 +382,7 @@ plot_forecast(cambio_diario_sf %>%
 
 Projeta N Dfs, passados no parâmetro _ellipsis_ *...*, utilizando o mesmo YoY do alvo. 
 
-Devido ao método empregado, permite que aberturas que compõem um indicador estejam sempre compatibilizadas com o indicador geral; independente da forma que ele é composto. 
+Devido ao método empregado, permite que aberturas que compõem um indicador estejam sempre compatibilizadas com o indicador geral; independente da forma que ele é composto.   
 Note-se que as aberturas terão o mesmo comportamento que a abertura geral. 
 
 ```{r, include=FALSE}
@@ -427,6 +429,7 @@ ggplot(plot_pim,
              ymax = Inf,
              alpha = 0.2)
 ```
+
 ### sf_seas_ratio
 
 A função realiza a projeção para uma série com sazonalidade a partir de uma projeção já existente para a série dessaz.
@@ -469,6 +472,9 @@ print(seas_ratio_historico)
 ```
 ### sf_conversao_cambio
 
+Realiza a projeção de um par de câmbio AB, utilizando a projeção dos pares AC e CB.  
+(Ex.: par a ser projetado: ARS/EUR, há projeção de ARS/USD e USD/EUR)
+
 ```{r, include=FALSE}
 cambios_proj <- load_clean_series(
   sid_vl = c('CLFXR0043000OEML', 
@@ -503,7 +509,7 @@ plot_forecast(cl_eur_sf %>%
 
 ## Univariado
 
-Funções que realizam projeção a partir de uma estimação, usando os valores históricos da própria série.
+Funções que realizam projeção por meio de uma estimação, usando os valores históricos da própria série.
 
 ### sf_hw
 
