@@ -18,18 +18,16 @@ coluna de valor para cada série que foi projetada, na mesma ordem em que foi in
 \description{
 Realiza a projeção de uma série diária, com base em uma série mensal já com projeção.
 O último dia da série diária será igual ao valor da série mensal fornecida.
-A interpolação feita é a linear, baseada nas funções 'naive' e 'drift_target'.
-A projeção da série diária considera apenas os dias úteis, seguindo calendário da Anbima.
 }
 \details{
-O @param target de entrada deve conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação;
+A interpolação feita na projeção é a linear, baseada nas funções 'naive' e 'drift_target'.
+A projeção da série diária considera apenas os dias úteis, seguindo calendário da Anbima.
 }
 \examples{
 \dontrun{
 sf_daily(target = cambio_real_mensal,
-         cambio_diario_venda, cambio_diario_compra)
+         cambio_diario_venda,
+         cambio_diario_compra)
 }
 
 }

@@ -1,11 +1,8 @@
-#' @title Forecasting top down
+#' @title Top-down forecasting
 #' @name sf_topdown
 #'
-#' @description Realiza a projeção de N séries utilizando uma projeção já feita em outra série.
+#' @description Realiza a projeção de N séries a partir de uma projeção já feita em outra série.
 #' Utiliza o YoY da série que já possui projeção (top) para projetar as demais séries (down).
-#' Por manter o mesmo YoY em cada mês para as séries (down), sempre haverá compatibilidade com a série (top).
-#' Exp: ao projetar aberturas da PMC/PMS/PIM/PIB, não importa como as aberturas são compostas para chegar no indicador geral,
-#' sempre estará compatibilizado.
 #'
 #' @author Gabriel Bellé
 #'
@@ -13,22 +10,18 @@
 #' @param ... Dataframe, N dfs que serão projetados utilizando a projeção contida em target_agg
 #'
 #' @details
-#' O @param target_agg deve conter as seguintes colunas:
-#' {date}: Data da observação:
-#' {vl}: valor da observação;
-#' {forecast}: bool indicando se o valor é projeção.
+#' Pelo método manter o mesmo YoY em cada mês para as séries (down), sempre haverá compatibilidade com a série (top).
 #'
-#' Os dfs passados em @param ... devem conter as colunas:
-#' {date}: Data da observação:
-#' {vl}: valor da observação e;
+#' Exp: ao projetar aberturas da PMC/PMS/PIM/PIB, não importa como as aberturas são compostas para chegar no indicador geral,
+#' sempre estará compatibilizado. Note-se que as aberturas terão o mesmo comportamento que a abertura geral.
 #'
-#' deve possuir mesma periodicidade que o @param target_agg.
+#' Os Dfs devem possuir mesma periodicidade que o target_agg.
 #'
 #' @return Retorna um dataframe com colunas de \code{date}, \code{forecast} e uma
 #' coluna de valor para cada série que foi projetada, na mesma ordem em que foi inputada na função.
 #'
 #' @examples
-#' sf_topdown(target_agg = df_pmc_geral,
+#' sf_topdown(target_agg = pmc_geral,
 #'            pmc_construcao, pmc_eletrodomestico, pmc_vestuario)
 #'
 #' @export

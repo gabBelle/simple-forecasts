@@ -22,6 +22,8 @@ Carrega e limpas as séries da FS.
 \details{
 Baixa as séries da FS utilizando o pacote series.4macro e limpa elas
 para que fiquem no formato de {tibble}, empiladas e indicando qual valor é projeção.
+
+Se o parâmetro estimate for TRUE baixa apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
 }
 \examples{
 load_clean_series(sid_vl = c('BREMP0018000OOML', 'BREMP0018000SOML'),

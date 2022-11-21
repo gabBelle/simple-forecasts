@@ -12,6 +12,8 @@
 #' @details Baixa as séries da FS utilizando o pacote series.4macro e limpa elas
 #' para que fiquem no formato de {tibble}, empiladas e indicando qual valor é projeção.
 #'
+#' Se o parâmetro estimate for TRUE baixa apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
+#'
 #' @return O retorno é um df contendo as colunas: sid, date, forecast e vl.
 #'
 #' @examples
@@ -47,6 +49,19 @@ load_clean_series <- function(sid_vl, auth_path, estimate = NULL) {
     dplyr::rename(date = dt) %>%
     dplyr::select(-lbl) %>%
     dplyr::relocate(forecast, .before = 'vl')
+
+  if(base::is.null(estimate)) {
+    cleaned_series <- cleaned_series %>%
+      dplyr::select(date, vl, forecast)
+  } else if (estimate) {
+    cleaned_series <- cleaned_series %>%
+      dplyr::filter(forecast) %>%
+      dplyr::select(date, vl, forecast)
+  } else {
+    cleaned_series <- cleaned_series %>%
+      dplyr::filter(!forecast) %>%
+      dplyr::select(date, vl, forecast)
+  }
 
   return(cleaned_series)
 }

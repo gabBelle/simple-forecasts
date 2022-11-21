@@ -10,12 +10,10 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
 
 ```{r, include=FALSE}
-
 options(scipen=5)
 
 library(simpleforecasts)
 library(tidyverse)
-
 ```
 
 ## Utils
@@ -26,8 +24,9 @@ Funções que não realizam projeções, mas são úteis e fornecem suporte ao t
 
 Carrega as séries do 4macro em formato _tibble_.  
 As séries são retornadas empilhadas, organizadas pela coluna sid.  
-Contém as colunas: sid, date, forecast, vl  
+Retorna as colunas: sid, date, forecast, vl  
 
+Se o parâmetro estimate for TRUE baixa apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
 
 ```{r}
 data <- simpleforecasts::load_clean_series(
@@ -38,28 +37,29 @@ data <- simpleforecasts::load_clean_series(
     'BRIND0003000OOML', #PIM Transformação
     'BRPRC0046000OOML', #IPCA BR
     'USPRC0001000OOML', #IPC US
-    'BRFXR0031000OODL', #Cambio Diário
+    'BRFXR0003000OAML', #Cambio R$/USD
+    'BRFXR0031000OODL'  #Cambio Diário
     ),
   auth_path = '../auth.ini',
-  estimate = F
+  estimate = FALSE
 )
 ```
 
 ### split_series
 
 Recupera apenas uma das séries carregadas pela fct _load_clean_series_.  
-Também permite filtrar se é desejado dado estimado ou não.  
+
+Se o parâmetro estimate for TRUE seleciona apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
 
 ```{r}
 pib_4i <- data %>% 
   simpleforecasts::split_series(sid_vl = 'BRGDP0081000ROML')
 ```
 
-
 ### get_seas_adj
 
 Calcula, automaticamente, a série sem efeito sazonal.   
-Utiliza o método X13, STL ou uma média entre eles.  
+Utiliza o método X13, STL ou uma média entre eles, de acordo com o parâmetro type ('X13', 'STL', 'mean'), padrão é média.  
 
 ```{r}
 pib_dessaz <- pib_4i %>% 
@@ -84,7 +84,8 @@ plot_dessaz <- pib_4i %>%
   rename(fs_dessaz = vl) %>% 
   select(-forecast) %>% 
   pivot_longer(-date) %>% 
-  filter(date >= '2010-01-01')
+  filter(date >= '2010-01-01') %>% 
+  mutate(name = factor(name, levels= c('original', 'fs_dessaz', 'sf_dessaz')))
 
 ggplot(plot_dessaz, aes(x=date, y=value, color=name)) +
   geom_line(size = 1)
@@ -92,10 +93,10 @@ ggplot(plot_dessaz, aes(x=date, y=value, color=name)) +
 
 ### cambio_real
 
-Calcula a taxa de câmbio real, utilizando a inflação dos dois países.
-Deve-se selecionar um ano-mês para corresponder à base do índice.
+Calcula a taxa de câmbio real, utilizando a inflação dos dois países participantes.
+Deve-se selecionar um ano-mês para corresponder à base do índice, e passá-lo no parâmetro mes_base.
 
-```{r}
+```{r, include=FALSE}
 rs_usd <- data %>% 
   split_series('BRFXR0003000OAML') %>% 
   filter(date >= '1994-12-01')
@@ -143,7 +144,8 @@ plot_cambio <- rs_usd %>%
     nominal = cumprod(nominal),
     sf_real = cumprod(sf_real)
   ) %>% 
-  pivot_longer(-date)
+  pivot_longer(-date) %>% 
+  mutate(name = factor(name, levels = c('nominal', 'fs_real', 'sf_real')))
 
 
 ggplot(plot_cambio, aes(x = date, y = value, color = name)) +
@@ -165,7 +167,7 @@ Podem ser classificadas em três grupos:
 
 2) Utiliza uma informação inserida manualmente: 
 
-O dado passado como parâmetro pode provir de uma projeção feita em periodicidade maior (de anual para mensal; de mensal para diária). Ou então provir de uma premissa (0.1% de crescimento mensal; YoY de 5%)
+O valor de parâmetro pode provir de uma projeção feita em periodicidade maior (de anual para mensal; de mensal para diária). Ou então provir de uma premissa (0.1% de crescimento mensal; YoY de 5%)
 
   + sf_drift: opções _manual_ e _target_, adicionam tendência com base em crescimento mensal esperado ou em um alvo para o último mês;
   + sf_target: equivalente ao sf_drift opção _target_, com a diferença que adiciona sazonalidade, por meio do fator sazonal médio histórico;
@@ -197,7 +199,8 @@ plot_forecast <- function(x) {
 
 ### sf_naive
 
-Naive forecasting. Repete o último valor realizado até o fim da projeção.
+Projeão Naive.
+Repete o último valor realizado até o fim da projeção.
 
 ```{r}
 pib_naive <- pib_4i %>% 
@@ -248,7 +251,7 @@ pib_drift_hist <- simpleforecasts::sf_drift(
 )
 ```
 
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_drift_hist)
 ```
 ```{r}
@@ -258,7 +261,7 @@ pib_drift_hist_snaive <- simpleforecasts::sf_drift(
 )
 ```
 
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_drift_hist_snaive)
 ```
 
@@ -274,7 +277,7 @@ pib_drift_manual <- simpleforecasts::sf_drift(
 )
 ```
 
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_drift_manual)
 ```
 
@@ -290,7 +293,7 @@ pib_drift_target <- simpleforecasts::sf_drift(
   trend_type = 'linear'
 )
 ```
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_drift_target)
 ```
 
@@ -312,7 +315,7 @@ pib_target <- simpleforecasts::sf_target(
   end_forecast = '2025-12-01'
 )
 ```
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_target)
 ```
 
@@ -320,7 +323,8 @@ plot_forecast(pib_target)
 
 A projeção é feita com base no YoY médio para o ano esperado. 
 
-A função lida com situações em que já existem meses do ano com dado realizado, logo um YoY histórico. Compatibiliza os valores para os meses seguintes, fazendo com que o YoY médio do ano seja igual ao passado no parâmetro.
+A função lida com situações em que já existem meses do ano com dado realizado, ou seja, já possui um YoY histórico. 
+Ela compatibiliza os valores para os meses seguintes, fazendo com que o YoY médio do ano seja igual ao valor no parâmetro.
 
 Os valores em target_aop podem ser tanto na mesma unidade da série quanto variação em %. Por exemplo, 120 para número índice ou 0.1 (para 10%). Basta indicar em is_yoy qual o formato; se já estiver em yoy, is_yoy = TRUE. 
 Padrão é FALSE. 
@@ -333,24 +337,26 @@ pib_aop <- simpleforecasts::sf_aop(
   is_yoy = TRUE
 )
 ```
-```{r}
+```{r, echo=FALSE}
 plot_forecast(pib_aop)
 ```
 
 ### sf_daily
 
-Realiza projeção de uma série diária, semelhante ao _sf_drift_ target. A projeção é uma tendência linear até o alvo.
+Realiza projeção de uma série diária, usandop método semelhante ao _sf_drift_ target.
+A projeção é uma tendência linear até o alvo.
 
 No entanto, o valor objetivo é o dado projetado em uma série mensal.
 
-```{r}
+A função utiliza o parâmetro _ellipsis_ *...*, no qual é possível adicionar N Dfs para serem projetados com o mesmo target. 
+
+```{r, include=FALSE}
 cambio_diario <- data %>% 
   split_series('BRFXR0031000OODL') %>% 
   filter(date >= '2022-01-01')
 
 cambio_mensal_fs_proj <- load_clean_series(sid_vl = c('BRFXR0003000OAML'),
-                                           auth_path = '../auth.ini',
-                                           estimate = T) %>% 
+                                           auth_path = '../auth.ini') %>% 
   split_series('BRFXR0003000OAML') %>% 
   filter(date >= '2022-01-01' & date <= '2025-12-01')
 ```
@@ -358,34 +364,176 @@ cambio_mensal_fs_proj <- load_clean_series(sid_vl = c('BRFXR0003000OAML'),
 ```{r}
 cambio_diario_sf <- simpleforecasts::sf_daily(
   target = cambio_mensal_fs_proj, 
-  cambio_diario,
-  cambio_diario)
-```
-```{r}
-plot_forecast(cambio_diario_sf)
+  cambio_diario
+  )
 ```
 
+```{r, echo=FALSE}
+plot_forecast(cambio_diario_sf %>% 
+                rename(vl = vl.x) %>% 
+                filter(date <= '2023-12-01'))
+```
+
+### sf_topdown
+
+Projeta N Dfs, passados no parâmetro _ellipsis_ *...*, utilizando o mesmo YoY do alvo. 
+
+Devido ao método empregado, permite que aberturas que compõem um indicador estejam sempre compatibilizadas com o indicador geral; independente da forma que ele é composto. 
+Note-se que as aberturas terão o mesmo comportamento que a abertura geral. 
+
+```{r, include=FALSE}
+pim_geral <- load_clean_series(
+  sid_vl = c('BRIND0001000OOML'),
+  auth_path = '../auth.ini'
+) %>% 
+  split_series('BRIND0001000OOML') %>% 
+  filter(date <= '2025-12-01')
+
+pim_extrativa <- data %>% 
+  split_series('BRIND0002000OOML')
+
+pim_transformacao <- data %>% 
+  split_series('BRIND0003000OOML')
+```
 
 ```{r}
-data <- simpleforecasts::load_clean_series(
-  sid_vl = c(
-    'BRGDP0081000ROML', #PIB 4i
-    'BRIND0001000OOML', #PIM
-    'BRIND0002000OOML', #PIM Extrativa
-    'BRIND0003000OOML', #PIM Transformação
-    'BRPRC0046000OOML', #IPCA BR
-    'USPRC0001000OOML', #IPC US
-    'BRFXR0003000OAML', #Cambio R$/USD
-    'BRFXR0031000OODL', #Cambio Diário
-    'BRMTG0003JOIOAML'  #Temperatura Média
-    ),
-  auth_path = '../auth.ini',
-  estimate = F
+pim_topdown <- simpleforecasts::sf_topdown(
+  target_agg = pim_geral,
+  pim_extrativa,
+  pim_transformacao
 )
 ```
 
 
+```{r, echo=FALSE}
+plot_pim <- pim_topdown %>% 
+  rename(geral = target_vl) %>% 
+  rename(extrativa = vl.x) %>% 
+  rename(transformacao = vl.y) %>% 
+  select(-c(forecast.x, forecast.y)) %>% 
+  pivot_longer(-c(date, forecast)) %>% 
+  mutate(name = factor(name, levels = c('geral', 'extrativa', 'transformacao')))
 
+ggplot(plot_pim, 
+       aes(x=date, y = value)) +
+  facet_wrap(~name, ncol = 1) +
+  geom_line(size = 1) +
+  annotate("rect",
+             xmin = max(filter(plot_pim,!forecast)$date),
+             xmax = max(plot_pim$date),
+             ymin = min(filter(plot_pim,!forecast)$value),
+             ymax = Inf,
+             alpha = 0.2)
+```
+### sf_seas_ratio
 
+A função realiza a projeção para uma série com sazonalidade a partir de uma projeção já existente para a série dessaz.
+
+Para demonstrar seu uso, primeiramente projetemos uma série dessaz:
+
+```{r}
+pib_dessaz_naive <- pib_dessaz %>% 
+  sf_naive(end_forecast = '2025-01-01') %>% 
+  sf_drift()
+```
+
+```{r, echo=FALSE}
+plot_forecast(pib_dessaz_naive)
+```
+
+Utiliza a função para projetar a série original: 
+
+```{r}
+pib_seas_adj <- simpleforecasts::sf_seas_ratio(
+  df_original = pib_4i,
+  df_dessaz = pib_dessaz_naive,
+  nyears = 10
+)
+```
+```{r, echo=FALSE}
+plot_forecast(pib_seas_adj)
+```
+
+Caso seja fornecido uma série dessaz sem projeção, o retorno passa a ser apenas o fator sazonal histórico médio:
+
+```{r}
+seas_ratio_historico <- simpleforecasts::sf_seas_ratio(
+  df_original = pib_4i,
+  df_dessaz = pib_dessaz
+)
+```
+```{r, echo=FALSE}
+print(seas_ratio_historico)
+```
+### sf_conversao_cambio
+
+```{r, include=FALSE}
+cambios_proj <- load_clean_series(
+  sid_vl = c('CLFXR0043000OEML', 
+             'CLFXR0044000OEML',
+             'USFXR0010000OEML'),
+  auth_path = '../auth.ini'
+)
+
+cl_eur_realizado <- cambios_proj %>% 
+  split_series('CLFXR0044000OEML',
+               estimate = FALSE)
+
+cl_usd_proj <- cambios_proj %>% 
+  split_series('CLFXR0043000OEML')
+
+usd_eur_proj <- cambios_proj %>% 
+  split_series('USFXR0010000OEML')
+```
+
+```{r}
+cl_eur_sf <- simpleforecasts::sf_conversao_cambio(
+  df = cl_eur_realizado,
+  df_target = cl_usd_proj,
+  df_ratio = usd_eur_proj
+)
+```
+
+```{r}
+plot_forecast(cl_eur_sf %>% 
+                filter(date <= '2029-12-01'))
+```
+
+## Univariado
+
+Funções que realizam projeção a partir de uma estimação, usando os valores históricos da própria série.
+
+### sf_hw
+
+Método Holt-Winters de suavização exponencial.
+
+O parâmetro type permite selecionar método específico: multiplicative, additive, trend e NULL (default).
+
+```{r}
+pib_hw <- simpleforecasts::sf_hw(
+  df = pib_4i,
+  type = 'multiplicative',
+  end_forecast = '2025-12-01'
+)
+```
+
+```{r, echo=FALSE}
+plot_forecast(pib_hw)
+```
+
+### sf_arima 
+
+Método Arima de projeção, é configurado automaticamente com os parâmetros default do pacote fable.
+
+```{r}
+pib_arima <- simpleforecasts::sf_arima(
+  df = pib_4i,
+  end_forecast = '2025-12-01'
+)
+```
+
+```{r, include=FALSE}
+plot_forecast(pib_arima)
+```
 
 

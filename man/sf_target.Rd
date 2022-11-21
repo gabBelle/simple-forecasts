@@ -15,8 +15,7 @@ sf_target(df, end_forecast, nyears = NULL, target_value, trend_type = "linear")
 
 \item{target_value}{Vetor de valores indicando a projeção desejada para final de período;}
 
-\item{trend_type}{o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
-alvo em target_value. Aceita os valores (linear, exponencial).}
+\item{trend_type}{Tipo de tendência (linear ou exponential). Padrão é linear.}
 }
 \value{
 Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método naïve,
@@ -25,20 +24,20 @@ e com a coluna forecast indicando quais observações são projeção.
 \description{
 Projeta uma série mensal ou trimestral, tendo como alvo um valor final, inserido manualmente.
 Mantém a sazonalidade histórica para os meses projetados.
-A função também lida com uma série que termina em qualquer mês do ano (Exp: último realizado 04/22, será completado os meses restantes até dezembro)
-
-É um wrapper das funções: naive, seas_adj, seas_ratio, drift_target.
 }
 \details{
-O @param df de entrada deve conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação;
+A função lida com série que termina em qualquer mês do ano (Exp: último realizado 04/22, será completado os meses restantes até dezembro)
 
-O @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
+É um wrapper das funções: naive, seas_adj, seas_ratio, drift_target.
+
+O target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
 end_projection = '2025-12-01' e target_value = c(150, 200)
 
 Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
+
+Em trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+alvo em target_value. Aceita os valores (linear, exponencial).
 }
 \examples{
 sf_target(df,

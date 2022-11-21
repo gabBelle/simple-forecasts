@@ -21,14 +21,10 @@ Incorpora tendência na projeção de uma série.
 Para calcular a tendência, utiliza os valores fornecidos, que devem ser \% de MoM a ser aplicado na projeção.
 }
 \details{
-O @param df_forecast de entrada deve conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação.
-{forecast}: bool indicando se a observação é uma projeção.
-
-O @param manual_drift deve conter um vetor numérico onde cada constante
+O manual_drift deve conter um vetor numérico onde cada constante
 indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
 a quantidade de anos a ser projetada, repetirá-se o último valor colocado.
+
 Ex: manual_drift = c(0.1, 0.1, 0.15, 0.2).
 Assim, será utilizado 0.1\% nos dois primeiros anos, 0.15\% no terceiro, 0.2% no quarto e nos anos seguintes,
 até o fim do horizonte da projeção.

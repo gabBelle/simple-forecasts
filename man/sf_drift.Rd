@@ -15,55 +15,59 @@ sf_drift(
 \arguments{
 \item{df_forecast}{Dataframe contendo a série já projetada, a ser adicionada tendência;}
 
-\item{nyears}{indica quantos anos do histórico serão utilizados para calcular a tendência linear/exponencial.
-Se nenhum valor fornecido, utilizará o histórico completo.}
+\item{nyears}{Opcional, constante numérica. X anos do histórico.}
 
-\item{manual_drift}{deve conter um vetor numérico onde cada constante
-indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
-a quantidade de anos a ser projetada, repetirá-se o último valor colocado.
-Ex: manual_drift = c(0.1, 0.1, 0.15, 0.2).
-Assim, será utilizado 0.1\% nos dois primeiros anos, 0.15% no terceiro, 0.2\% no quarto e nos anos seguintes,
-até o fim do horizonte da projeção.
+\item{manual_drift}{Opcional, vetor de valores numéricos indicando drift em \% MoM;}
 
-Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma \% do valor em t + valor em t.}
+\item{target_value}{Opcional, vetor de valores indicando a projeção desejada para final de período.}
 
-\item{target_value}{indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
-Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
-target_value = c(150, 200)
-
-Isto fará com que a tendência seja tal qual respeite os valores objetivo.}
-
-\item{trend_type}{o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
-alvo em target_value. Aceita os valores (linear, exponencial).}
-}
-\value{
-O retorno é um Dataframe. A coluna 'vl' representa os valores adicionados de tendência.
-A coluna 'vl_old' é incluída e contém a projeção anterior à modificação.
+\item{trend_type}{Opcional, linear ou exponencial. Utilizado apenas quando target_value é chamado.}
 }
 \description{
 Incorpora tendência na projeção de uma série.
 Ou seja, dada uma série já com projeção, adiciona uma tendência.
 
-Recomenda-se utilizar as seguintes funções para projetar o df de input:
-sf_naive e sf_seas_naive
+Recomenda-se utilizar a função sf_naive ou sf_snaive para previamente projetar o input.
 }
 \details{
-Deve-se preencher apenas uma opção entre @param nyear, @param manual_drift e @param target_value
+Deve-se preencher apenas uma opção entre nyear, manual_drift e target_value
 As restantes devem ser mantidas como NULL.
 
-O @param df_forecast de entrada deve conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação;
-{forecast}: bool indicando se a observação é uma projeção.
+nyears: indica quantos anos do histórico serão utilizados para calcular a tendência linear/exponencial.
+Se nenhum valor fornecido, utilizará o histórico completo.
+
+manual_drift: deve conter um vetor numérico onde cada constante
+indica a variação mensal desejada na projeção para cada ano. Caso o tamanho seja menor que
+a quantidade de anos a ser projetada, repetirá-se o último valor colocado.
+
+Ex: manual_drift = c(0.1, 0.1, 0.15, 0.2).
+Assim, será utilizado 0.1\% nos dois primeiros anos, 0.15% no terceiro, 0.2\% no quarto e nos anos seguintes,
+até o fim do horizonte da projeção.
+
+Atenção: este parâmetro faz com que a tendência seja exponencial. O aumento em t+1 é uma \% do valor em t + valor em t.
+
+target_value: indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
+
+Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
+target_value = c(150, 200)
+
+Isto fará com que a tendência seja tal qual respeite os valores objetivo.
+Atenção: o alvo será atingido apenas se a projeção de entrada vier da sf_naive.
+
+trend_type: o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+alvo em target_value. Aceita os valores (linear, exponencial).
+
+O retorno é um Dataframe. A coluna 'vl' representa os valores adicionados de tendência.
+A coluna 'vl_old' é incluída e contém a projeção anterior à modificação.
 }
 \examples{
-sf_drift(df = cleaned_df,
+sf_drift(df_forecast = cleaned_df,
          nyears = 5)
 
-sf_drift(df = cleaned_df,
+sf_drift(df_forecast = cleaned_df,
          manual_drift = c(0.1, 0.15))
 
-sf_drift(df = cleaned_df,
+sf_drift(df_forecast = cleaned_df,
          target_value = c(200, 230),
          trend_type = 'linear')
 }

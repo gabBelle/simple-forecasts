@@ -21,12 +21,7 @@ Incorpora tendência na projeção de uma série.
 Para calcular a tendência, utiliza a tendência linear presente no histórico da série.
 }
 \details{
-O @param df_forecast de entrada deve conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação;
-{forecast}: bool indicando se a observação é uma projeção.
-
-O @param nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
+O nyears indica quantos anos do histórico serão utilizados para calcular a tendência linear.
 Se nenhum valor fornecido, utilizará o histórico completo.
 }
 \examples{

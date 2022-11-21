@@ -11,22 +11,14 @@ sf_conversao_cambio(df, df_target, df_ratio)
 
 \item{df_target}{Dataframe contendo a taxa de câmbio apenas com projeção;}
 
-\item{df_ratio}{Dataframe contendo apenas a projeção do par incomum em @param df e @param df_target}
+\item{df_ratio}{Dataframe contendo apenas a projeção do par incomum em df e df_target}
 }
 \value{
-Retorna um Dataframe contendo a projeção da série @param df, no mesmo horizente que @param df_target
+Retorna um Dataframe contendo a projeção da série df, no mesmo horizente que df_target
 }
 \description{
-Realiza a projeção de um par de câmbio AB, se disponível a projeção dos pares AC e CB.
+Realiza a projeção de um par de câmbio AB, utilizando a projeção dos pares AC e CB.
 (Ex.: par a ser projetado: ARS/EUR, há projeção de ARS/USD e USD/EUR)
-}
-\details{
-Todos parâmetros de entrada devem conter pelo as colunas de:
-{date}: Data da observação:
-{vl}: valor da observação;
-
-Caso algum parâmetro tenha tanto dado realizado quanto projetado, deve ser acompanhado de uma coluna
-{forecast}: bool contendo se o valor é projetado
 }
 \examples{
 sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur)

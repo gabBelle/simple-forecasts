@@ -8,10 +8,6 @@
 #'
 #' @author Luiz Paulo T.
 #'
-#' @details O input deve ser um data.frame organizado:
-#' {date}: Data da observação:
-#' {vl}: valor da observação.
-#'
 #' @return Retorna o mesmo df de input, porém a projeção formalmente aplicada com o método Auto.Arima
 #'
 #' @examples
@@ -49,8 +45,6 @@ sf_arima <- function(df, end_forecast){
                         dplyr::full_join(dplyr::select(serie, date, forecast), by = "date")
 
     return(projection_arima)
-
-
   }
 
 

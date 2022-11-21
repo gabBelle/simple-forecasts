@@ -17,11 +17,6 @@ Retorna o mesmo df de input, porém a projeção formalmente aplicada com o mét
 \description{
 Aplicação do método Auto.Arima para projeção
 }
-\details{
-O input deve ser um data.frame organizado:
-{date}: Data da observação:
-{vl}: valor da observação.
-}
 \examples{
 sf_arima(df, end_forecast = "2026-12-01")
 

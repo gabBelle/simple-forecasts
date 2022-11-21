@@ -1,24 +1,16 @@
 #' @title Modify country in exchange rate
 #' @name sf_conversao_cambio
 #'
-#' @description Realiza a projeção de um par de câmbio AB, se disponível a projeção dos pares AC e CB.
+#' @description Realiza a projeção de um par de câmbio AB, utilizando a projeção dos pares AC e CB.
 #' (Ex.: par a ser projetado: ARS/EUR, há projeção de ARS/USD e USD/EUR)
 #'
 #' @author Gabriel Bellé
 #'
 #' @param df Dataframe contendo a série limpa e organizada a ser projetada, contendo apenas dados realizados;
 #' @param df_target Dataframe contendo a taxa de câmbio apenas com projeção;
-#' @param df_ratio Dataframe contendo apenas a projeção do par incomum em @param df e @param df_target
+#' @param df_ratio Dataframe contendo apenas a projeção do par incomum em df e df_target
 #'
-#' @details
-#' Todos parâmetros de entrada devem conter pelo as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação;
-#'
-#' Caso algum parâmetro tenha tanto dado realizado quanto projetado, deve ser acompanhado de uma coluna
-#' {forecast}: bool contendo se o valor é projetado
-#'
-#' @return Retorna um Dataframe contendo a projeção da série @param df, no mesmo horizente que @param df_target
+#' @return Retorna um Dataframe contendo a projeção da série df, no mesmo horizente que df_target
 #'
 #' @examples
 #' sf_conversaro_cambio(df = ars_eur, df_target = ars_usd, df_ratio = usd_eur)

@@ -22,11 +22,6 @@ fazendo a compatibilização pela razão histórica entre a série original e a 
 
 Caso seja fornecido uma série dessaz sem projeção, o retorno passa a ser apenas o fator sazonal histórico médio.
 }
-\details{
-Tanto o @param df_original quanto o @param df_dessaz, devem possuir as seguintes colunas:
-{date}: Data da observação:
-{vl}: valor da observação.
-}
 \examples{
 sf_seas_ratio(df_original = df_cleaned,
               df_dessaz = df_forecast_dessaz,
