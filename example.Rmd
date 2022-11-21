@@ -38,9 +38,7 @@ data <- simpleforecasts::load_clean_series(
     'BRIND0003000OOML', #PIM Transformação
     'BRPRC0046000OOML', #IPCA BR
     'USPRC0001000OOML', #IPC US
-    'BRFXR0003000OAML', #Cambio R$/USD
     'BRFXR0031000OODL', #Cambio Diário
-    'BRMTG0003JOIOAML'  #Temperatura Média
     ),
   auth_path = '../auth.ini',
   estimate = F
@@ -180,6 +178,23 @@ O dado passado como parâmetro pode provir de uma projeção feita em periodicid
   + sf_seas_ratio: projeta a série original a partir de sua projeção dessaz;
   + sf_conversao_cambio: projeta um par de câmbio a partir de outros dois pares.
 
+
+```{r, include=FALSE}
+plot_forecast <- function(x) {
+  out <- ggplot(x,
+                aes(x = date, y = vl)) +
+    geom_line(size = 1) +
+    annotate("rect",
+             xmin = max(filter(x,!forecast)$date),
+             xmax = max(x$date),
+             ymin = min(filter(x,!forecast)$vl),
+             ymax = Inf,
+             alpha = 0.2)
+  
+  return(out)
+}
+```
+
 ### sf_naive
 
 Naive forecasting. Repete o último valor realizado até o fim da projeção.
@@ -190,15 +205,7 @@ pib_naive <- pib_4i %>%
 ```
 
 ```{r, echo=FALSE}
-ggplot(pib_naive,
-       aes(x = date, y = vl)) +
-  geom_line(size = 1) +
-  annotate("rect",
-         xmin = max(filter(pib_naive,!forecast)$date),
-         xmax = max(pib_naive$date),
-         ymin = min(filter(pib_naive,!forecast)$vl),
-         ymax = Inf,
-         alpha = 0.2)
+plot_forecast(pib_naive)
 ```
 ### sf_snaive
 
@@ -212,15 +219,7 @@ pib_snaive <- pib_4i %>%
 ```
 
 ```{r, echo=FALSE}
-ggplot(pib_snaive,
-       aes(x = date, y = vl)) +
-  geom_line(size = 1) +
-  annotate("rect",
-         xmin = max(filter(pib_snaive,!forecast)$date),
-         xmax = max(pib_snaive$date),
-         ymin = min(filter(pib_snaive,!forecast)$vl),
-         ymax = Inf,
-         alpha = 0.2)
+plot_forecast(pib_snaive)
 ```
 
 ```{r}
@@ -229,13 +228,164 @@ pib_snaive_2y <- pib_4i %>%
 ```
 
 ```{r, echo=FALSE}
-ggplot(pib_snaive_2y,
-       aes(x = date, y = vl)) +
-  geom_line(size = 1) +
-  annotate("rect",
-         xmin = max(filter(pib_snaive_2y,!forecast)$date),
-         xmax = max(pib_snaive_2y$date),
-         ymin = min(filter(pib_snaive_2y,!forecast)$vl),
-         ymax = Inf,
-         alpha = 0.2)
+plot_forecast(pib_snaive_2y)
 ```
+### sf_drift 
+
+A função _sf_drift_ funciona adicionando tendência em uma projeção pré-existente.  
+A tendência fica melhor comportada quando a projeção inicial provém da _sf_naive_ ou da _sf_snaive_.
+Ela possui três formas de calcular a tendência: _hist_, _manual_ e _target_.   
+Apenas um método pode ser selecionado por vez.   
+  
+#### sf_drift: hist
+
+Calcula a tendência linear futura a partir da tendência linear histórica de X anos (nyears)
+
+```{r}
+pib_drift_hist <- simpleforecasts::sf_drift(
+  df_forecast = pib_naive,
+  nyears = 7
+)
+```
+
+```{r}
+plot_forecast(pib_drift_hist)
+```
+```{r}
+pib_drift_hist_snaive <- simpleforecasts::sf_drift(
+  df_forecast = pib_snaive_2y,
+  nyear = 7
+)
+```
+
+```{r}
+plot_forecast(pib_drift_hist_snaive)
+```
+
+
+#### sf_drift: manual
+
+Calcula a tendência linear futura a partir da tendência linear histórica de X anos (nyears)
+
+```{r}
+pib_drift_manual <- simpleforecasts::sf_drift(
+  df_forecast = pib_naive,
+  manual_drift = c(0.02, 0.05, 0.1, 0.4)
+)
+```
+
+```{r}
+plot_forecast(pib_drift_manual)
+```
+
+#### sf_drift: target
+
+Calcula tendência futura tal qual atinga o valor indicado para fim de ano.
+Nesta opção, é possível definir o tipo de tendência em trend_type, podendose ser 'linear' ou 'exponential'. 
+
+```{r}
+pib_drift_target <- simpleforecasts::sf_drift(
+  df_forecast = pib_naive,
+  target_value = c(650388.9, 660388.9, 678388.9),
+  trend_type = 'linear'
+)
+```
+```{r}
+plot_forecast(pib_drift_target)
+```
+
+### sf_target
+
+Calcula tendência futura tal qual atinga o valor indicado para fim de ano. 
+Chama a função _seas_ratio_ para adicionar sazonalidade na projeção.
+
+Diferentemente da função _sf_drift_, ela não precisa receber um df já com projeção.
+
+Ela realiza os seguintes passos: a) realiza o dessaz automático; b) calcula a sazonalidade histórica; c) converte o target em target dessaz; d) chama as funções sf_naive e sf_drift target para projetar a série dessaz; e) calcula a projeção original com o sf_seas_ratio. 
+
+```{r}
+pib_target <- simpleforecasts::sf_target(
+  df = pib_4i,
+  target_value = c(650388.9, 660388.9, 678388.9),
+  nyears = 10,
+  trend_type = 'linear',
+  end_forecast = '2025-12-01'
+)
+```
+```{r}
+plot_forecast(pib_target)
+```
+
+### sf_aop
+
+A projeção é feita com base no YoY médio para o ano esperado. 
+
+A função lida com situações em que já existem meses do ano com dado realizado, logo um YoY histórico. Compatibiliza os valores para os meses seguintes, fazendo com que o YoY médio do ano seja igual ao passado no parâmetro.
+
+Os valores em target_aop podem ser tanto na mesma unidade da série quanto variação em %. Por exemplo, 120 para número índice ou 0.1 (para 10%). Basta indicar em is_yoy qual o formato; se já estiver em yoy, is_yoy = TRUE. 
+Padrão é FALSE. 
+
+```{r}
+pib_aop <- simpleforecasts::sf_aop(
+  df = pib_4i,
+  end_forecast = '2034-12-01',
+  target_aop = c(0.027, 0.007, 0.016, 0.008, 0.004),
+  is_yoy = TRUE
+)
+```
+```{r}
+plot_forecast(pib_aop)
+```
+
+### sf_daily
+
+Realiza projeção de uma série diária, semelhante ao _sf_drift_ target. A projeção é uma tendência linear até o alvo.
+
+No entanto, o valor objetivo é o dado projetado em uma série mensal.
+
+```{r}
+cambio_diario <- data %>% 
+  split_series('BRFXR0031000OODL') %>% 
+  filter(date >= '2022-01-01')
+
+cambio_mensal_fs_proj <- load_clean_series(sid_vl = c('BRFXR0003000OAML'),
+                                           auth_path = '../auth.ini',
+                                           estimate = T) %>% 
+  split_series('BRFXR0003000OAML') %>% 
+  filter(date >= '2022-01-01' & date <= '2025-12-01')
+```
+
+```{r}
+cambio_diario_sf <- simpleforecasts::sf_daily(
+  target = cambio_mensal_fs_proj, 
+  cambio_diario,
+  cambio_diario)
+```
+```{r}
+plot_forecast(cambio_diario_sf)
+```
+
+
+```{r}
+data <- simpleforecasts::load_clean_series(
+  sid_vl = c(
+    'BRGDP0081000ROML', #PIB 4i
+    'BRIND0001000OOML', #PIM
+    'BRIND0002000OOML', #PIM Extrativa
+    'BRIND0003000OOML', #PIM Transformação
+    'BRPRC0046000OOML', #IPCA BR
+    'USPRC0001000OOML', #IPC US
+    'BRFXR0003000OAML', #Cambio R$/USD
+    'BRFXR0031000OODL', #Cambio Diário
+    'BRMTG0003JOIOAML'  #Temperatura Média
+    ),
+  auth_path = '../auth.ini',
+  estimate = F
+)
+```
+
+
+
+
+
+

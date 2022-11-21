@@ -4,9 +4,6 @@
 #' @description Incorpora tendência na projeção de uma série.
 #' Para calcular a tendência, utiliza a diferença entre o último dado realizado e o valor alvo para o ano.
 #'
-#' Atenção! O comportamento dessa função funciona como esperado apenas quando a projeção de entrada foi
-#' originada de um método naive (onde a projeção é apenas a repetição do último valor).
-#'
 #' @author Gabriel Bellé
 #'
 #' @param df_forecast Dataframe contendo a série a ser projetada;
@@ -14,19 +11,18 @@
 #' @param trend_type Tipo de tendência (linear ou exponential).
 #'
 #' @details
-#' O @param df_forecast de entrada deve conter pelo as colunas de:
-#' {date}: Data da observação:
-#' {vl}: valor da observação;
-#' {forecast}: bool indicando se a observação é uma projeção.
 #'
-#' O @param target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
+#' O target_value indica o valor para o final de período desejado, idealmete advindo de uma projeção anual.
 #' Por exemplo, a projeção anual do LatamFocus aponta 150 para 2023 e 200 para 2024, pode-se preencher:
 #' end_projection = '2025-12-01' e target_value = c(150, 200)
 #'
 #' Isto fará com que a tendência linear seja tal qual respeite os valores de entrada.
 #'
-#' @param trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
+#' Em trend_type o valor no parâmetro irá modificar a fórmula empregada para cálculo do drift quando utilizado os valores
 #' alvo em target_value. Aceita os valores (linear, exponencial).
+#'
+#'Atenção! O comportamento dessa função funciona como esperado apenas quando a projeção de entrada foi
+#' originada de um método naive (onde a projeção é apenas a repetição do último valor).
 #'
 #' @return O retorno é um df, contendo as colunas de:
 #' {date}; {vl}; {drift} e {forecast}.

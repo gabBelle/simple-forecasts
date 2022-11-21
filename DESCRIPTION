@@ -27,4 +27,5 @@ Imports:
     tsibble,
     zoo
 Depends: 
-    lubridate
+    lubridate,
+    bizdays
