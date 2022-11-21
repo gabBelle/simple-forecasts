@@ -49,8 +49,10 @@ Utiliza o método X13, STL ou uma média entre eles, de acordo com o
 parâmetro type (‘X13’, ‘STL’, ‘mean’), padrão é média.
 
 ``` r
-pib_dessaz <- pib_4i %>% 
-  get_seas_adj()
+pib_dessaz <- simpleforecasts::get_seas_adj(
+  df = pib_4i,
+  type = 'mean'
+)
 ```
 
 ![](Example_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
