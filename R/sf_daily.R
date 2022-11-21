@@ -43,9 +43,9 @@ sf_daily <- function(target, ...) {
 
   df_target <- target %>%
     dplyr::mutate(date = dplyr::lead(date) - 1,
-           date = base::ifelse(base::is.na(date), base::as.Date('2050-12-31'), date),
-           date = base::as.Date(date, origin = '1970-01-01'),
-           date = bizdays::adjust.previous(date,cal_br)) %>%
+                  date = base::ifelse(base::is.na(date), base::max(target$date)  %m+% months(1), date),
+                  date = base::as.Date(date, origin = '1970-01-01'),
+                  date = bizdays::adjust.previous(date,cal_br)) %>%
     dplyr::filter(date>base::max(df_diario$date)) %>%
     dplyr::rename(target_vl = vl)
 
@@ -55,12 +55,16 @@ sf_daily <- function(target, ...) {
 
   df_merged <- df_diario %>%
     dplyr::mutate(forecast = F) %>%
-    dplyr::bind_rows(tibble(date = daily_dates,
-                     forecast = T)) %>%
+    dplyr::bind_rows(dplyr::tibble(date = daily_dates,
+                                   forecast = T)) %>%
     dplyr::left_join(df_target) %>%
     dplyr::mutate(dplyr::across(starts_with('vl'), ~base::ifelse(base::is.na(.x), target_vl, .x)),
            month = base::format(date, '%Y-%m'))
 
+  if('vl' %in% base::colnames(df_merged)) {
+    df_merged <- df_merged %>%
+      dplyr::rename(vl.x = vl)
+  }
 
   df_drift <- df_merged %>%
     #Seleciona o ultimo dado realizado
