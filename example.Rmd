@@ -15,12 +15,6 @@ options(scipen=5)
 
 library(simpleforecasts)
 library(tidyverse)
-library(series.4macro)
-library(fable)
-library(feasts)
-library(tsibble)
-library(seasonal)
-library(tsibbledata)
 
 ```
 
@@ -78,8 +72,7 @@ pib_dessaz <- pib_4i %>%
 pib_fs_dessaz <- load_clean_series(
   sid_vl = 'BRGDP0081000WOML',
   estimate = FALSE,
-  auth_path = '../auth.ini'
-) %>% 
+  auth_path = '../auth.ini') %>% 
   split_series('BRGDP0081000WOML')
 ```
 
@@ -128,8 +121,7 @@ rs_usd_real <- simpleforecasts::cambio_real(
 real_fs <- load_clean_series(
   sid_vl = 'BRFXR0005000RAML',
   estimate = F,
-  auth_path = '../auth.ini'
-) %>% 
+  auth_path = '../auth.ini') %>% 
   split_series('BRFXR0005000RAML') %>% 
   filter(date >= '1995-01-01')
 ```
@@ -163,30 +155,30 @@ ggplot(plot_cambio, aes(x = date, y = value, color = name)) +
 ## Simples
 
 Funções que realizam projeções simples, sem qualquer modelo de série de tempo. 
-Elas devem funcionar tanto para periodicidade mensal quanto trimestral.
+Elas funcionam tanto para periodicidade mensal quanto trimestral.
 
-Existem três grupos:
+Podem ser classificadas em três grupos:
 
 1) Utiliza informação histórica da própria série:
 
-a) sf_naive: repete último valor;
-b) sf_snaive: repete último valor/média de X anos para um mesmo mês;
-c) sf_drif: opção _hist_, utiliza tendência histórica de X anos;
+  + sf_naive: repete último valor;
+  + sf_snaive: repete último valor/média de X anos para um mesmo mês;
+  + sf_drif: opção _hist_, utiliza tendência histórica de X anos;
 
 2) Utiliza uma informação inserida manualmente: 
 
 O dado passado como parâmetro pode provir de uma projeção feita em periodicidade maior (de anual para mensal; de mensal para diária). Ou então provir de uma premissa (0.1% de crescimento mensal; YoY de 5%)
 
-a) sf_drift: opções _manual_ e _target_, adicionam tendência com base em crescimento mensal esperado ou em um alvo para o último mês;
-b) sf_target: equivalente ao sf_drift opção _target_, com a diferença que adiciona sazonalidade, por meio do fator sazonal médio histórico;
-c) sf_aop: projeta utilizando YoY médio para o ano. Compatibiliza o YoY para o restante do primeiro para respeitar a média desejada.
+  + sf_drift: opções _manual_ e _target_, adicionam tendência com base em crescimento mensal esperado ou em um alvo para o último mês;
+  + sf_target: equivalente ao sf_drift opção _target_, com a diferença que adiciona sazonalidade, por meio do fator sazonal médio histórico;
+  + sf_aop: projeta a partir do YoY médio para o ano. Compatibiliza o YoY para o restante do primeiro ano, respeitando a média desejada.
 
 3) Utiliza projeção calculada em outra série:
 
-a) sf_daily: projeta a série diária como sendo interpolação linear até o dado para o mês, vindo de outra série;
-b) sf_topdown: utiliza a mesma variação anual que outra série;
-c) sf_seas_ratio: projeta a série original a partir de sua projeção dessaz;
-d) sf_conversao_cambio: projeta um par de câmbio a partir de outros dois.
+  + sf_daily: projeta a série diária como interpolação linear, no qual o último valor é igual ao dado mensal (provindo de outra série);
+  + sf_topdown: utiliza a mesma variação anual que outra série;
+  + sf_seas_ratio: projeta a série original a partir de sua projeção dessaz;
+  + sf_conversao_cambio: projeta um par de câmbio a partir de outros dois pares.
 
 ### sf_naive
 
@@ -197,7 +189,7 @@ pib_naive <- pib_4i %>%
   simpleforecasts::sf_naive(end_forecast = '2025-12-01')
 ```
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ggplot(pib_naive,
        aes(x = date, y = vl)) +
   geom_line(size = 1) +
@@ -232,18 +224,18 @@ ggplot(pib_snaive,
 ```
 
 ```{r}
-pib_snaive_5y <- pib_4i %>% 
-  simpleforecasts::sf_snaive(nyear = 5, end_forecast = '2025-12-01')
+pib_snaive_2y <- pib_4i %>% 
+  simpleforecasts::sf_snaive(nyear = 2, end_forecast = '2025-12-01')
 ```
 
 ```{r, echo=FALSE}
-ggplot(pib_snaive_5y,
+ggplot(pib_snaive_2y,
        aes(x = date, y = vl)) +
   geom_line(size = 1) +
   annotate("rect",
-         xmin = max(filter(pib_snaive_5y,!forecast)$date),
-         xmax = max(pib_snaive_5y$date),
-         ymin = min(filter(pib_snaive_5y,!forecast)$vl),
+         xmin = max(filter(pib_snaive_2y,!forecast)$date),
+         xmax = max(pib_snaive_2y$date),
+         ymin = min(filter(pib_snaive_2y,!forecast)$vl),
          ymax = Inf,
          alpha = 0.2)
 ```
