@@ -409,3 +409,5 @@ pib_arima <- simpleforecasts::sf_arima(
   end_forecast = '2025-12-01'
 )
 ```
+
+![](Example_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->

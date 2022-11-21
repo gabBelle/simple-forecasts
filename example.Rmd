@@ -540,7 +540,7 @@ pib_arima <- simpleforecasts::sf_arima(
 )
 ```
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 plot_forecast(pib_arima)
 ```
 
