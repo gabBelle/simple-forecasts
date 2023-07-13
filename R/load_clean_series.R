@@ -50,18 +50,5 @@ load_clean_series <- function(sid_vl, auth_path, estimate = NULL) {
     dplyr::select(-lbl) %>%
     dplyr::relocate(forecast, .before = 'vl')
 
-  if(base::is.null(estimate)) {
-    cleaned_series <- cleaned_series %>%
-      dplyr::select(date, vl, forecast)
-  } else if (estimate) {
-    cleaned_series <- cleaned_series %>%
-      dplyr::filter(forecast) %>%
-      dplyr::select(date, vl, forecast)
-  } else {
-    cleaned_series <- cleaned_series %>%
-      dplyr::filter(!forecast) %>%
-      dplyr::select(date, vl, forecast)
-  }
-
   return(cleaned_series)
 }

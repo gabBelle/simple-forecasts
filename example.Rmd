@@ -253,6 +253,8 @@ pib_drift_hist <- simpleforecasts::sf_drift(
   df_forecast = pib_naive,
   nyears = 7
 )
+
+sf_drift()
 ```
 
 ```{r, echo=FALSE}
@@ -288,7 +290,7 @@ plot_forecast(pib_drift_manual)
 #### sf_drift: target
 
 Calcula tendência futura tal qual atinja o valor indicado para fim de ano.  
-Nesta opção, é possível definir o tipo de tendência em trend_type, podendose ser 'linear' ou 'exponential'. 
+Nesta opção, é possível definir o tipo de tendência em trend_type, podendo ser 'linear' ou 'exponential'. 
 
 ```{r}
 pib_drift_target <- simpleforecasts::sf_drift(
