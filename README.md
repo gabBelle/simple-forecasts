@@ -2,7 +2,7 @@
 ## Descrição
 
 O pacote realiza projeções simples para séries de tempo.
-Incluí métodos de modelagem univariada, copiar outra projeção, funções auxiliares e integração com FS e FaaS (futuramente).
+Inclui métodos de modelagem univariada, copiar outra projeção, funções auxiliares e integração com FS e FaaS (futuramente).
 
 ## Instalação
 
