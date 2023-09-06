@@ -31,7 +31,8 @@ load_clean_series <- function(sid_vl, estimate = NULL) {
       forecast = estimated
     ) %>%
     relocate(sid, date, forecast, vl) %>%
-    mutate(date = as.Date(str_sub(date, 1, 10)))
+    mutate(date = as.Date(str_sub(date, 1, 10)),
+           vl = as.numeric(vl))
 
   if(estimate %>% is.null()) {
     cleaned_series <- series_fs
