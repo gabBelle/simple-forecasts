@@ -5,6 +5,7 @@
 #'
 #' @param sid_vl Vetor chr com um ou mais SeriesID;
 #' @param estimate bool indicando se deve baixar dado realizado ou projetado. Se NULL baixa ambas.
+#' @param to_wider bool indicando se o retorno deve ser _wider_. Atenção: a coluna indicativa se é forecast será removida, sugere-se usar esse parametro como T concomitante ao estimate = F
 #'
 #' @author Gabriel Bellé
 #'
@@ -22,7 +23,7 @@
 #'
 #' @export
 
-load_clean_series <- function(sid_vl, estimate = NULL) {
+load_clean_series <- function(sid_vl, estimate = NULL, to_wider = F) {
 
   series_fs <- fs4i::get_multi_series(series_code = sid_vl, estimate = T)[[1]] %>%
     dplyr::rename(
@@ -30,18 +31,24 @@ load_clean_series <- function(sid_vl, estimate = NULL) {
       vl = value,
       forecast = estimated
     ) %>%
-    relocate(sid, date, forecast, vl) %>%
-    mutate(date = as.Date(str_sub(date, 1, 10)),
-           vl = as.numeric(vl))
+    dplyr::relocate(sid, date, forecast, vl) %>%
+    dplyr::mutate(date = base::as.Date(stringr::str_sub(date, 1, 10)),
+                  vl = base::as.numeric(vl))
 
   if(estimate %>% is.null()) {
     cleaned_series <- series_fs
   } else if(estimate) {
     cleaned_series <- series_fs %>%
-      filter(forecast)
+      dplyr::filter(forecast)
   } else{
     cleaned_series <- series_fs %>%
-      filter(!forecast)
+      dplyr::filter(!forecast)
+  }
+
+  if(to_wider) {
+    series_fs <- series_fs %>%
+      dplyr::select(-forecast) %>%
+      tidyr::pivot_wider(names_from = sid, values_from = vl)
   }
 
   return(cleaned_series)
