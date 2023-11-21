@@ -4,14 +4,14 @@
 \alias{load_clean_series}
 \title{Load and Clean Feature Store (FS) series}
 \usage{
-load_clean_series(sid_vl, auth_path, estimate = NULL)
+load_clean_series(sid_vl, estimate = NULL, to_wider = F)
 }
 \arguments{
 \item{sid_vl}{Vetor chr com um ou mais SeriesID;}
 
-\item{auth_path}{Chr com caminho para o arquivo de autenticação do series.4macro;}
-
 \item{estimate}{bool indicando se deve baixar dado realizado ou projetado. Se NULL baixa ambas.}
+
+\item{to_wider}{bool indicando se o retorno deve ser _wider_. Atenção: a coluna indicativa se é forecast será removida, sugere-se usar esse parametro como T concomitante ao estimate = F}
 }
 \value{
 O retorno é um df contendo as colunas: sid, date, forecast e vl.
@@ -20,14 +20,14 @@ O retorno é um df contendo as colunas: sid, date, forecast e vl.
 Carrega e limpas as séries da FS.
 }
 \details{
-Baixa as séries da FS utilizando o pacote series.4macro e limpa elas
+Baixa as séries da FS utilizando o pacote fs-r-package e limpa elas
 para que fiquem no formato de {tibble}, empiladas e indicando qual valor é projeção.
+A autenticação deve ser feita no pacote fs-r-package.
 
 Se o parâmetro estimate for TRUE baixa apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
 }
 \examples{
 load_clean_series(sid_vl = c('BREMP0018000OOML', 'BREMP0018000SOML'),
-                  auth_path = 'User/auth.ini'
                   estimate = TRUE)
 
 }
