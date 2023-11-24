@@ -25,7 +25,7 @@
 
 load_clean_series <- function(sid_vl, estimate = NULL, to_wider = F) {
 
-  series_fs <- fs4i::get_multi_series(series_code = sid_vl[1:2], estimate = T)[[1]] %>%
+  series_fs <- fs4i::get_multi_series(series_code = sid_vl, estimate = T)[[1]] %>%
     dplyr::rename(
       sid = serie,
       vl = value,

@@ -29,6 +29,11 @@ Retorna as colunas: sid, date, forecast, vl
 Se o parâmetro estimate for TRUE baixa apenas projeções, FALSE apenas dado realizado e NULL tudo disponível.
 
 ```{r}
+fs4i::login()
+```
+
+
+```{r}
 data <- simpleforecasts::load_clean_series(
   sid_vl = c(
     'BRGDP0081000ROML', #PIB 4i
@@ -37,10 +42,11 @@ data <- simpleforecasts::load_clean_series(
     'BRIND0003000OOML', #PIM Transformação
     'BRPRC0046000OOML', #IPCA BR
     'USPRC0001000OOML', #IPC US
-    'BRFXR0003000OAML', #Cambio R$/USD
-    'BRFXR0031000OODL'  #Cambio Diário
+    'BRFXR0022000OAML', #Cambio R$/USD
+    'BRFXR0031000OODL', #Cambio Diário
+    'BRPRC0113000OAML',  #Preço médio de gasolina nominal
+    'BRPRC0113000RAML'  #Preço médio de gasolina nominal
     ),
-  auth_path = '../auth.ini',
   estimate = FALSE
 )
 ```
@@ -100,7 +106,7 @@ Deve-se selecionar um ano-mês para corresponder à base do índice, e passá-lo
 
 ```{r, include=FALSE}
 rs_usd <- data %>% 
-  split_series('BRFXR0003000OAML') %>% 
+  split_series('BRFXR0015000OAML') %>% 
   filter(date >= '1994-12-01')
 
 ipca <- data %>% 
@@ -119,7 +125,7 @@ rs_usd_real <- simpleforecasts::cambio_real(
 ) 
 ```
 ```{r, include=FALSE}
-real_fs <- load_clean_series(
+real_fs <- simpleforecasts::load_clean_series(
   sid_vl = 'BRFXR0005000RAML',
   estimate = F,
   auth_path = '../auth.ini') %>% 
@@ -152,6 +158,41 @@ plot_cambio <- rs_usd %>%
 
 ggplot(plot_cambio, aes(x = date, y = value, color = name)) +
   geom_line(size = 1)
+```
+
+### Deflação
+
+Calcula uma série deflacionada a partir de uma série nominal e um índice de inflação
+
+```{r}
+gas_nom <- data %>% 
+  split_series('BRPRC0113000OAML')
+
+ipca <- data %>% 
+  split_series('BRPRC0046000OOML')
+```
+
+```{r}
+gas_real <- get_realvl(df = gas_nom, df_cpi = ipca,
+                       dt_base_in = '2001-07-01',
+                       dt_base_fim = NULL)
+```
+### Nominal
+
+Calcula uma série inflacionada a partir de uma série real e um índice de inflação
+
+```{r}
+gas_real <- data %>% 
+  split_series('BRPRC0113000RAML')
+
+ipca <- data %>% 
+  split_series('BRPRC0046000OOML')
+```
+
+```{r}
+get_nom <- get_nominalvl(df = gas_real, df_cpi = ipca,
+                         dt_base_in = '2001-07-01',
+                         dt_base_fim = '2001-07-01')
 ```
 
 ## Simples
